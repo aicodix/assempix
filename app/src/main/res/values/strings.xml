@@ -31,7 +31,7 @@
     <string name="peak_meter_description">Peak audio signal level</string>
     <string name="preamble_sync">Synchronized using estimates:\nSTO: %1$d and CFO: %2$.2f Hz\n\nDecoded preamble data:\nMode: %3$d and Call: %4$s</string>
     <string name="preamble_fail">Preamble failure</string>
-    <string name="preamble_nope">Ignoring preamble</string>
+    <string name="preamble_nope">Ignoring preamble and estimates:\nSTO: %1$d and CFO: %2$.2f Hz\n\nDecoded preamble data:\nMode: %3$d and Call: %4$s</string>
     <string name="heap_error">Not enough memory</string>
     <string name="decoding_failed">Decoding failed</string>
     <string name="payload_unknown">Payload unknown</string>

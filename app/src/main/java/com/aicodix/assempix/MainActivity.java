@@ -122,7 +122,8 @@ public class MainActivity extends AppCompatActivity {
 					binding.message.setText(getString(R.string.preamble_fail));
 					break;
 				case STATUS_NOPE:
-					binding.message.setText(getString(R.string.preamble_nope));
+					syncedDecoder(symbolTimingOffset, carrierFrequencyOffset, operationMode, callSign);
+					binding.message.setText(getString(R.string.preamble_nope, symbolTimingOffset[0], carrierFrequencyOffset[0], operationMode[0], new String(callSign).trim()));
 					break;
 				case STATUS_HEAP:
 					binding.message.setText(getString(R.string.heap_error));

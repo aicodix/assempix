@@ -96,7 +96,9 @@ class Decoder : public Interface {
 	int carrier_offset = 0;
 	int mod_bits = 0;
 	int symbol_position = search_position + 2 * extended_length;
+	int cached_mode = 0;
 	int operation_mode = 0;
+	uint64_t cached_call = 0;
 	uint64_t call_sign = 0;
 
 	static uint32_t argb(float a, float r, float g, float b) {
@@ -274,14 +276,16 @@ class Decoder : public Interface {
 		crc.reset();
 		if (crc(md << 9) != cs)
 			return STATUS_FAIL;
-		int mode = md & 255;
-		if (mode < 6 || mode > 13)
+		cached_mode = md & 255;
+		cached_call = md >> 8;
+		if (cached_mode < 6 || cached_mode > 13)
 			return STATUS_NOPE;
-		uint64_t call = md >> 8;
-		if (call == 0 || call >= 129961739795077L)
+		if (cached_call == 0 || cached_call >= 129961739795077L) {
+			cached_call = 0;
 			return STATUS_NOPE;
-		operation_mode = mode;
-		call_sign = call;
+		}
+		operation_mode = cached_mode;
+		call_sign = cached_call;
 		return STATUS_OKAY;
 	}
 
@@ -352,8 +356,8 @@ public:
 	void synced(int32_t *sto, float *cfo, int32_t *mode, int8_t *call) final {
 		*sto = correlator.symbol_pos;
 		*cfo = correlator.cfo_rad * (RATE / Const::TwoPi());
-		*mode = operation_mode;
-		base37(call, call_sign, 9);
+		*mode = cached_mode;
+		base37(call, cached_call, 9);
 	}
 
 	bool fetch(uint8_t *payload) final {
