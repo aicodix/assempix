@@ -142,8 +142,7 @@ public class MainActivity extends AppCompatActivity {
 		}
 	};
 
-	private void storePayload(String mime, String suffix) {
-		Date date = new Date();
+	private void storePayload(String mime, String suffix, Date date) {
 		String name = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(date);
 		String title = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(date);
 		name += "_" + callTrim.replace(' ', '_') + suffix;
@@ -208,15 +207,19 @@ public class MainActivity extends AppCompatActivity {
 			return;
 		}
 		String suffix;
+		String type;
 		switch (opt.outMimeType) {
 			case "image/jpeg":
 				suffix = ".jpg";
+				type = "JPEG";
 				break;
 			case "image/png":
 				suffix = ".png";
+				type = "PNG";
 				break;
 			case "image/webp":
 				suffix = ".webp";
+				type = "WebP";
 				break;
 			default:
 				binding.message.setText(getString(R.string.payload_unknown));
@@ -232,8 +235,10 @@ public class MainActivity extends AppCompatActivity {
 			return;
 		}
 		binding.image.setImageBitmap(bitmap);
-		setTitle(callTrim);
-		storePayload(opt.outMimeType, suffix);
+		Date date = new Date();
+		String hour = new SimpleDateFormat("HH:mm:ss", Locale.US).format(date);
+		setTitle(hour + " - " + callTrim + " - " + type);
+		storePayload(opt.outMimeType, suffix, date);
 	}
 
 	private String getAudioSourceString(int audioSource) {
@@ -259,7 +264,6 @@ public class MainActivity extends AppCompatActivity {
 				audioRecord.read(audioBuffer, 0, audioBuffer.length);
 				binding.message.setText(getString(R.string.audio_recording_config, sampleRate, getAudioSourceString(audioSource)));
 			} else {
-				setTitle(R.string.app_name);
 				binding.message.setText(getString(R.string.audio_recording_error));
 			}
 		}
