@@ -41,7 +41,7 @@ namespace DSP { using std::abs; using std::min; using std::cos; using std::sin; 
 struct Interface {
 	virtual int process(uint32_t *, uint32_t *, uint32_t *, uint32_t *, const int16_t *) = 0;
 
-	virtual void synced(int32_t *, float *, int32_t *, int8_t *) = 0;
+	virtual void cached(float *, int32_t *, int8_t *) = 0;
 
 	virtual bool fetch(uint8_t *) = 0;
 
@@ -353,8 +353,7 @@ public:
 		return RATE;
 	}
 
-	void synced(int32_t *sto, float *cfo, int32_t *mode, int8_t *call) final {
-		*sto = correlator.symbol_pos;
+	void cached(float *cfo, int32_t *mode, int8_t *call) final {
 		*cfo = correlator.cfo_rad * (RATE / Const::TwoPi());
 		*mode = cached_mode;
 		base37(call, cached_call, 9);

@@ -23,18 +23,30 @@
     <string name="audio_recording_paused">Recording paused</string>
     <string name="audio_recording_error">Recording audio failed.\nCheck if access is blocked.\nRestart device if necessary to gain back access.</string>
     <string name="audio_recording_config">Sample Rate: %1$d Hz\nAudio Source: %2$s</string>
-    <string name="operating_at_rate">Operating at %1$d Hz</string>
     <string name="image_description">Decoded image</string>
     <string name="spectrum_description">Spectrum of audio signal</string>
     <string name="spectrogram_description">Spectrogram of audio signal</string>
     <string name="constellation_description">Demodulated constellation points</string>
     <string name="peak_meter_description">Peak audio signal level</string>
-    <string name="preamble_sync">Synchronized using estimates:\nSTO: %1$d and CFO: %2$.2f Hz\n\nDecoded preamble data:\nMode: %3$d and Call: %4$s</string>
+    <string name="status_message">Carrier: %1$.2f Hz\nMode: %2$s\nCall: %3$s\n\n%4$s</string>
+    <string name="preamble_sync">Synchronized and receiving</string>
     <string name="preamble_fail">Preamble failure</string>
-    <string name="preamble_nope">Ignoring preamble and estimates:\nSTO: %1$d and CFO: %2$.2f Hz\n\nDecoded preamble data:\nMode: %3$d and Call: %4$s</string>
+    <string name="preamble_nope">Ignoring preamble</string>
+    <string name="mode_unsupported">%1$d (unsupported)</string>
+    <string-array name="operation_modes">
+        <item>6 (8PSK, 2700 Hz, 10 s)</item>
+        <item>7 (8PSK, 2500 Hz, 11 s)</item>
+        <item>8 (QPSK, 2500 Hz, 16 s)</item>
+        <item>9 (QPSK, 2250 Hz, 18 s)</item>
+        <item>10 (8PSK, 3200 Hz, 9 s)</item>
+        <item>11 (8PSK, 2400 Hz, 11 s)</item>
+        <item>12 (QPSK, 2400 Hz, 16 s)</item>
+        <item>13 (QPSK, 1600 Hz, 24 s)</item>
+    </string-array>
     <string name="heap_error">Not enough memory</string>
     <string name="decoding_failed">Decoding failed</string>
     <string name="payload_unknown">Payload unknown</string>
+    <string name="image_received">Image received</string>
     <string name="creating_picture_directory_failed">Creating picture directory failed.\nCheck permissions.</string>
     <string name="creating_picture_file_failed">Creating picture file failed.\nCheck permissions.</string>
     <string name="storing_picture_failed">Storing picture failed</string>

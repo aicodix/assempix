@@ -56,10 +56,9 @@ Java_com_aicodix_assempix_MainActivity_fetchDecoder(
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_aicodix_assempix_MainActivity_syncedDecoder(
+Java_com_aicodix_assempix_MainActivity_cachedDecoder(
 	JNIEnv *env,
 	jobject,
-	jintArray JNI_symbolTimingOffset,
 	jfloatArray JNI_carrierFrequencyOffset,
 	jintArray JNI_operationMode,
 	jbyteArray JNI_callSign) {
@@ -67,12 +66,9 @@ Java_com_aicodix_assempix_MainActivity_syncedDecoder(
 	if (!decoder)
 		return;
 
-	jint *symbolTimingOffset, *operationMode;
+	jint *operationMode;
 	jfloat *carrierFrequencyOffset;
 	jbyte *callSign;
-	symbolTimingOffset = env->GetIntArrayElements(JNI_symbolTimingOffset, nullptr);
-	if (!symbolTimingOffset)
-		goto symbolTimingOffsetFail;
 	carrierFrequencyOffset = env->GetFloatArrayElements(JNI_carrierFrequencyOffset, nullptr);
 	if (!carrierFrequencyOffset)
 		goto carrierFrequencyOffsetFail;
@@ -83,8 +79,7 @@ Java_com_aicodix_assempix_MainActivity_syncedDecoder(
 	if (!callSign)
 		goto callSignFail;
 
-	decoder->synced(
-		reinterpret_cast<int32_t *>(symbolTimingOffset),
+	decoder->cached(
 		reinterpret_cast<float *>(carrierFrequencyOffset),
 		reinterpret_cast<int32_t *>(operationMode),
 		reinterpret_cast<int8_t *>(callSign));
@@ -94,9 +89,7 @@ Java_com_aicodix_assempix_MainActivity_syncedDecoder(
 	env->ReleaseIntArrayElements(JNI_operationMode, operationMode, 0);
 	operationModeFail:
 	env->ReleaseFloatArrayElements(JNI_carrierFrequencyOffset, carrierFrequencyOffset, 0);
-	carrierFrequencyOffsetFail:
-	env->ReleaseIntArrayElements(JNI_symbolTimingOffset, symbolTimingOffset, 0);
-	symbolTimingOffsetFail:;
+	carrierFrequencyOffsetFail:;
 }
 
 extern "C" JNIEXPORT jint JNICALL

@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
 	private final int peakMeterWidth = 16, peakMeterHeight = 1;
 	private Bitmap spectrumBitmap, spectrogramBitmap, constellationBitmap, peakMeterBitmap;
 	private int[] spectrumPixels, spectrogramPixels, constellationPixels, peakMeterPixels;
-	private int[] symbolTimingOffset, operationMode;
+	private int[] operationMode;
 	private float[] carrierFrequencyOffset;
 	private byte[] callSign;
 	private byte[] payload;
@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
 	private native int processDecoder(int[] spectrumPixels, int[] spectrogramPixels, int[] constellationPixels, int[] peakMeterPixels, short[] audioBuffer);
 
-	private native void syncedDecoder(int[] symbolTimingOffset, float[] carrierFrequencyOffset, int[] operationMode, byte[] callSign);
+	private native void cachedDecoder(float[] carrierFrequencyOffset, int[] operationMode, byte[] callSign);
 
 	private native boolean fetchDecoder(byte[] payload);
 
@@ -119,29 +119,46 @@ public class MainActivity extends AppCompatActivity {
 				case STATUS_OKAY:
 					break;
 				case STATUS_FAIL:
-					binding.message.setText(getString(R.string.preamble_fail));
+					statusMessage(R.string.preamble_fail);
 					break;
 				case STATUS_NOPE:
-					syncedDecoder(symbolTimingOffset, carrierFrequencyOffset, operationMode, callSign);
-					binding.message.setText(getString(R.string.preamble_nope, symbolTimingOffset[0], carrierFrequencyOffset[0], operationMode[0], new String(callSign).trim()));
+					float[] cfo = new float[1];
+					int[] mode = new int[1];
+					byte[] call = new byte[9];
+					cachedDecoder(cfo, mode, call);
+					String trim = new String(call).trim();
+					binding.message.setText(getString(R.string.status_message, cfo[0], modeString(mode[0]), trim, getString(R.string.preamble_nope)));
 					break;
 				case STATUS_HEAP:
 					binding.message.setText(getString(R.string.heap_error));
 					break;
 				case STATUS_SYNC:
-					syncedDecoder(symbolTimingOffset, carrierFrequencyOffset, operationMode, callSign);
+					cachedDecoder(carrierFrequencyOffset, operationMode, callSign);
 					callTrim = new String(callSign).trim();
-					binding.message.setText(getString(R.string.preamble_sync, symbolTimingOffset[0], carrierFrequencyOffset[0], operationMode[0], callTrim));
+					statusMessage(R.string.preamble_sync);
 					break;
 				case STATUS_DONE:
 					if (fetchDecoder(payload))
 						decodePayload();
 					else
-						binding.message.setText(getString(R.string.decoding_failed));
+						statusMessage(R.string.decoding_failed);
 					break;
 			}
 		}
 	};
+
+	private String modeString(int mode) {
+		if (mode >= 6 && mode <= 13)
+			return getResources().getStringArray(R.array.operation_modes)[mode - 6];
+		return getString(R.string.mode_unsupported, mode);
+	}
+
+	private void statusMessage(int status) {
+		if (callTrim != null)
+			binding.message.setText(getString(R.string.status_message, carrierFrequencyOffset[0], modeString(operationMode[0]), callTrim, getString(status)));
+		else
+			binding.message.setText(getString(status));
+	}
 
 	private void storePayload(String mime, String suffix, Date date) {
 		String name = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(date);
@@ -153,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
 		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
 			dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
 			if (!dir.exists() && !dir.mkdirs()) {
-				binding.message.setText(R.string.creating_picture_directory_failed);
+				statusMessage(R.string.creating_picture_directory_failed);
 				return;
 			}
 			File file;
@@ -163,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
 				stream.write(payload);
 				stream.close();
 			} catch (IOException e) {
-				binding.message.setText(R.string.creating_picture_file_failed);
+				statusMessage(R.string.creating_picture_file_failed);
 				return;
 			}
 			values.put(MediaStore.Images.ImageColumns.DATA, file.toString());
@@ -183,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
 				stream.write(payload);
 				stream.close();
 			} catch (IOException e) {
-				binding.message.setText(R.string.storing_picture_failed);
+				statusMessage(R.string.storing_picture_failed);
 				return;
 			}
 			values.clear();
@@ -204,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
 		opt.inJustDecodeBounds = true;
 		BitmapFactory.decodeByteArray(payload, 0, payload.length, opt);
 		if (opt.outMimeType == null) {
-			binding.message.setText(getString(R.string.payload_unknown));
+			statusMessage(R.string.payload_unknown);
 			return;
 		}
 		String suffix;
@@ -223,18 +240,19 @@ public class MainActivity extends AppCompatActivity {
 				type = "WebP";
 				break;
 			default:
-				binding.message.setText(getString(R.string.payload_unknown));
+				statusMessage(R.string.payload_unknown);
 				return;
 		}
 		if (opt.outWidth < 16 || opt.outWidth > 1024 || opt.outHeight < 16 || opt.outHeight > 1024) {
-			binding.message.setText(getString(R.string.payload_unknown));
+			statusMessage(R.string.payload_unknown);
 			return;
 		}
 		Bitmap bitmap = BitmapFactory.decodeByteArray(payload, 0, payload.length);
 		if (bitmap == null) {
-			binding.message.setText(getString(R.string.decoding_failed));
+			statusMessage(R.string.decoding_failed);
 			return;
 		}
+		statusMessage(R.string.image_received);
 		binding.image.setImageBitmap(bitmap);
 		Date date = new Date();
 		String hour = new SimpleDateFormat("HH:mm:ss", Locale.US).format(date);
@@ -401,7 +419,6 @@ public class MainActivity extends AppCompatActivity {
 		spectrumPixels = new int[spectrumWidth * spectrumHeight];
 		spectrogramPixels = new int[spectrogramWidth * spectrogramHeight];
 		peakMeterPixels = new int[peakMeterWidth * peakMeterHeight];
-		symbolTimingOffset = new int[1];
 		carrierFrequencyOffset = new float[1];
 		operationMode = new int[1];
 		callSign = new byte[9];
