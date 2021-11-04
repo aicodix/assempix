@@ -17,13 +17,13 @@ Java_com_aicodix_assempix_MainActivity_destroyDecoder(
 	decoder = nullptr;
 }
 
-extern "C" JNIEXPORT void JNICALL
+extern "C" JNIEXPORT jboolean JNICALL
 Java_com_aicodix_assempix_MainActivity_createDecoder(
 	JNIEnv *,
 	jobject,
 	jint sampleRate) {
 	if (decoder && decoder->rate() == sampleRate)
-		return;
+		return true;
 	delete decoder;
 	switch (sampleRate) {
 		case 8000:
@@ -38,6 +38,7 @@ Java_com_aicodix_assempix_MainActivity_createDecoder(
 		default:
 			decoder = nullptr;
 	}
+	return decoder != nullptr;
 }
 
 extern "C" JNIEXPORT jboolean JNICALL

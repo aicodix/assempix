@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
 
 	private native boolean fetchDecoder(byte[] payload);
 
-	private native void createDecoder(int sampleRate);
+	private native boolean createDecoder(int sampleRate);
 
 	private native void destroyDecoder();
 
@@ -315,13 +315,17 @@ public class MainActivity extends AppCompatActivity {
 		try {
 			AudioRecord testAudioRecord = new AudioRecord(audioSource, sampleRate, channelConfig, audioFormat, bufferSize * sampleSize);
 			if (testAudioRecord.getState() == AudioRecord.STATE_INITIALIZED) {
-				audioRecord = testAudioRecord;
-				audioBuffer = new short[extendedLength];
-				createDecoder(sampleRate);
-				audioRecord.setRecordPositionUpdateListener(audioListener);
-				audioRecord.setPositionNotificationPeriod(extendedLength);
-				if (restart)
-					startListening();
+				if (createDecoder(sampleRate)) {
+					audioRecord = testAudioRecord;
+					audioBuffer = new short[extendedLength];
+					audioRecord.setRecordPositionUpdateListener(audioListener);
+					audioRecord.setPositionNotificationPeriod(extendedLength);
+					if (restart)
+						startListening();
+				} else {
+					testAudioRecord.release();
+					binding.message.setText(getString(R.string.heap_error));
+				}
 			} else {
 				testAudioRecord.release();
 				binding.message.setText(getString(R.string.audio_init_failed));
