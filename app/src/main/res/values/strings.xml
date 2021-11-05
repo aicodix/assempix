@@ -57,7 +57,7 @@ The data recorded from the microphone is only used to fed the COFDMTV decoder, V
 The app uses a very small temporary buffer in volatile memory and constantly overwrites this buffer with new data from the microphone.
 The resulting images from the COFDMTV decoder is the only data that gets stored in persistent storage on your Android device.</string>
     <string name="about">About Assempix</string>
-    <string name="about_text">Assempix - Decoder for COFDMTV\nCopyright 2021 aicodix GmbH
+    <string name="about_text">Assempix %1$s\nCopyright 2021 aicodix GmbH
 \n\nPlease read the disclaimer at the bottom of this page.
 \n\nAssempix decodes COFDMTV encoded audio signals to images and is based on open-source software:
 \n\nOFDM modem decoder and specification:\nhttps://github.com/aicodix/modem\nBSD Zero Clause License
