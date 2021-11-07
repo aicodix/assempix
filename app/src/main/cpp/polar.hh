@@ -174,7 +174,9 @@ public:
 
 	bool operator()(uint8_t *message, const cmplx *cons, int operation_mode) {
 		prepare(operation_mode);
-		float prec = precision(cons);
+		float prec = 1;
+		if (std::is_integral<code_type>::value)
+			prec = precision(cons);
 		for (int i = 0; i < cons_cnt; ++i)
 			mod_soft(code + mod_bits * i, cons[i], prec);
 		lengthen();
