@@ -101,7 +101,9 @@ Java_com_aicodix_assempix_MainActivity_processDecoder(
 	jintArray JNI_spectrogramPixels,
 	jintArray JNI_constellationPixels,
 	jintArray JNI_peakMeterPixels,
-	jshortArray JNI_audioBuffer) {
+	jshortArray JNI_audioBuffer,
+	jint channelCount,
+	jint channelIndex) {
 
 	jint status = STATUS_HEAP;
 
@@ -131,7 +133,8 @@ Java_com_aicodix_assempix_MainActivity_processDecoder(
 		reinterpret_cast<uint32_t *>(spectrogramPixels),
 		reinterpret_cast<uint32_t *>(constellationPixels),
 		reinterpret_cast<uint32_t *>(peakMeterPixels),
-		reinterpret_cast<int16_t *>(audioBuffer));
+		reinterpret_cast<int16_t *>(audioBuffer),
+		channelCount, channelIndex);
 
 	env->ReleaseShortArrayElements(JNI_audioBuffer, audioBuffer, JNI_ABORT);
 	audioBufferFail:

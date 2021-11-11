@@ -66,6 +66,8 @@ public class MainActivity extends AppCompatActivity {
 	private AudioRecord audioRecord;
 	private int sampleRate;
 	private int audioSource;
+	private int channelCount;
+	private int channelIndex;
 	private short[] audioBuffer;
 	private ActivityMainBinding binding;
 	private Menu menu;
@@ -81,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
 	private byte[] payload;
 	private String callTrim;
 
-	private native int processDecoder(int[] spectrumPixels, int[] spectrogramPixels, int[] constellationPixels, int[] peakMeterPixels, short[] audioBuffer);
+	private native int processDecoder(int[] spectrumPixels, int[] spectrogramPixels, int[] constellationPixels, int[] peakMeterPixels, short[] audioBuffer, int channelCount, int channelIndex);
 
 	private native void cachedDecoder(float[] carrierFrequencyOffset, int[] operationMode, byte[] callSign);
 
@@ -100,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
 		@Override
 		public void onPeriodicNotification(AudioRecord audioRecord) {
 			audioRecord.read(audioBuffer, 0, audioBuffer.length);
-			int status = processDecoder(spectrumPixels, spectrogramPixels, constellationPixels, peakMeterPixels, audioBuffer);
+			int status = processDecoder(spectrumPixels, spectrogramPixels, constellationPixels, peakMeterPixels, audioBuffer, channelCount, channelIndex);
 			spectrumBitmap.setPixels(spectrumPixels, 0, spectrumWidth, 0, 0, spectrumWidth, spectrumHeight);
 			spectrogramBitmap.setPixels(spectrogramPixels, 0, spectrogramWidth, 0, 0, spectrogramWidth, spectrogramHeight);
 			constellationBitmap.setPixels(constellationPixels, 0, constellationWidth, 0, 0, constellationWidth, constellationHeight);
@@ -306,18 +308,21 @@ public class MainActivity extends AppCompatActivity {
 			audioRecord = null;
 		}
 		int channelConfig = AudioFormat.CHANNEL_IN_MONO;
+		channelCount = 1;
+		channelIndex = 0;
 		int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
 		int sampleSize = 2;
-		int bufferSize = 2 * Integer.highestOneBit(3 * sampleRate);
+		int frameSize = sampleSize * channelCount;
+		int bufferSize = 2 * Integer.highestOneBit(3 * sampleRate) * frameSize;
 		int symbolLength = (1280 * sampleRate) / 8000;
 		int guardLength = symbolLength / 8;
 		int extendedLength = symbolLength + guardLength;
 		try {
-			AudioRecord testAudioRecord = new AudioRecord(audioSource, sampleRate, channelConfig, audioFormat, bufferSize * sampleSize);
+			AudioRecord testAudioRecord = new AudioRecord(audioSource, sampleRate, channelConfig, audioFormat, bufferSize);
 			if (testAudioRecord.getState() == AudioRecord.STATE_INITIALIZED) {
 				if (createDecoder(sampleRate)) {
 					audioRecord = testAudioRecord;
-					audioBuffer = new short[extendedLength];
+					audioBuffer = new short[extendedLength * channelCount];
 					audioRecord.setRecordPositionUpdateListener(audioListener);
 					audioRecord.setPositionNotificationPeriod(extendedLength);
 					if (restart)

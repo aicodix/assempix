@@ -39,7 +39,7 @@ namespace DSP { using std::abs; using std::min; using std::cos; using std::sin; 
 #define STATUS_NOPE 5
 
 struct Interface {
-	virtual int process(uint32_t *, uint32_t *, uint32_t *, uint32_t *, const int16_t *) = 0;
+	virtual int process(uint32_t *, uint32_t *, uint32_t *, uint32_t *, const int16_t *, int, int) = 0;
 
 	virtual void cached(float *, int32_t *, int8_t *) = 0;
 
@@ -153,10 +153,10 @@ class Decoder : public Interface {
 		return freq;
 	}
 
-	void update_peak_meter(uint32_t *pixels, const int16_t *samples) {
+	void update_peak_meter(uint32_t *pixels, const int16_t *samples, int stride, int offset) {
 		int peak = 0;
 		for (int i = 0; i < extended_length; ++i)
-			peak = std::max(peak, std::abs((int) samples[i]));
+			peak = std::max(peak, std::abs((int) samples[stride * i + offset]));
 		int num = (peak * peak_meter_width + 16384) / 32768;
 		int cnt = std::max(prev_peak, num);
 		prev_peak = num;
@@ -367,12 +367,12 @@ public:
 		return result;
 	}
 
-	int process(uint32_t *spectrum_pixels, uint32_t *spectrogram_pixels, uint32_t *constellation_pixels, uint32_t *peak_meter_pixels, const int16_t *audio_buffer) final {
-		update_peak_meter(peak_meter_pixels, audio_buffer);
+	int process(uint32_t *spectrum_pixels, uint32_t *spectrogram_pixels, uint32_t *constellation_pixels, uint32_t *peak_meter_pixels, const int16_t *audio_buffer, int channel_count, int channel_index) final {
+		update_peak_meter(peak_meter_pixels, audio_buffer, channel_count, channel_index);
 		int status = STATUS_OKAY;
 		const cmplx *buf;
 		for (int i = 0; i < extended_length; ++i) {
-			buf = next_sample(audio_buffer[i]);
+			buf = next_sample(audio_buffer[channel_count * i + channel_index]);
 			if (correlator(buf)) {
 				status = preamble(buf);
 				if (status == STATUS_OKAY) {
