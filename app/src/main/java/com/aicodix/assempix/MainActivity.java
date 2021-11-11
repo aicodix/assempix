@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
 	private ShareActionProvider share;
 	private AudioRecord audioRecord;
 	private int sampleRate;
+	private int channelSelect;
 	private int audioSource;
 	private int channelCount;
 	private int channelIndex;
@@ -300,16 +301,23 @@ public class MainActivity extends AppCompatActivity {
 	private void initAudioRecord(boolean restart) {
 		if (audioRecord != null) {
 			boolean rateChanged = audioRecord.getSampleRate() != sampleRate;
+			boolean channelChanged = channelSelect == 0 ? audioRecord.getChannelCount() != 1 :
+				(audioRecord.getChannelCount() != 2 || channelIndex != channelSelect - 1);
 			boolean sourceChanged = audioRecord.getAudioSource() != audioSource;
-			if (!rateChanged && !sourceChanged)
+			if (!rateChanged && !channelChanged && !sourceChanged)
 				return;
 			stopListening();
 			audioRecord.release();
 			audioRecord = null;
 		}
 		int channelConfig = AudioFormat.CHANNEL_IN_MONO;
-		channelCount = 1;
 		channelIndex = 0;
+		channelCount = 1;
+		if (channelSelect > 0 && channelSelect < 3) {
+			channelIndex = channelSelect - 1;
+			channelCount = 2;
+			channelConfig = AudioFormat.CHANNEL_IN_STEREO;
+		}
 		int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
 		int sampleSize = 2;
 		int frameSize = sampleSize * channelCount;
@@ -350,6 +358,14 @@ public class MainActivity extends AppCompatActivity {
 		initAudioRecord(true);
 	}
 
+	private void setChannelSelect(int newChannelSelect) {
+		if (channelSelect == newChannelSelect)
+			return;
+		channelSelect = newChannelSelect;
+		updateChannelSelectMenu();
+		initAudioRecord(true);
+	}
+
 	private void setAudioSource(int newAudioSource) {
 		if (audioSource == newAudioSource)
 			return;
@@ -385,6 +401,7 @@ public class MainActivity extends AppCompatActivity {
 	protected void onSaveInstanceState(@NonNull Bundle state) {
 		state.putInt("nightMode", AppCompatDelegate.getDefaultNightMode());
 		state.putInt("sampleRate", sampleRate);
+		state.putInt("channelSelect", channelSelect);
 		state.putInt("audioSource", audioSource);
 		super.onSaveInstanceState(state);
 	}
@@ -392,15 +409,18 @@ public class MainActivity extends AppCompatActivity {
 	@Override
 	protected void onCreate(Bundle state) {
 		final int defaultSampleRate = 8000;
+		final int defaultChannelSelect = 0;
 		final int defaultAudioSource = MediaRecorder.AudioSource.DEFAULT;
 		if (state == null) {
 			SharedPreferences pref = getPreferences(Context.MODE_PRIVATE);
 			AppCompatDelegate.setDefaultNightMode(pref.getInt("nightMode", AppCompatDelegate.getDefaultNightMode()));
 			sampleRate = pref.getInt("sampleRate", defaultSampleRate);
+			channelSelect = pref.getInt("channelSelect", defaultChannelSelect);
 			audioSource = pref.getInt("audioSource", defaultAudioSource);
 		} else {
 			AppCompatDelegate.setDefaultNightMode(state.getInt("nightMode", AppCompatDelegate.getDefaultNightMode()));
 			sampleRate = state.getInt("sampleRate", defaultSampleRate);
+			channelSelect = state.getInt("channelSelect", defaultChannelSelect);
 			audioSource = state.getInt("audioSource", defaultAudioSource);
 		}
 		super.onCreate(state);
@@ -460,6 +480,20 @@ public class MainActivity extends AppCompatActivity {
 		}
 	}
 
+	private void updateChannelSelectMenu() {
+		switch (channelSelect) {
+			case 0:
+				menu.findItem(R.id.action_set_channel_default).setChecked(true);
+				break;
+			case 1:
+				menu.findItem(R.id.action_set_channel_first).setChecked(true);
+				break;
+			case 2:
+				menu.findItem(R.id.action_set_channel_second).setChecked(true);
+				break;
+		}
+	}
+
 	private void updateAudioSourceMenu() {
 		switch (audioSource) {
 			case MediaRecorder.AudioSource.DEFAULT:
@@ -487,6 +521,7 @@ public class MainActivity extends AppCompatActivity {
 		share = (ShareActionProvider) MenuItemCompat.getActionProvider(menu.findItem(R.id.menu_item_share));
 		this.menu = menu;
 		updateSampleRateMenu();
+		updateChannelSelectMenu();
 		updateAudioSourceMenu();
 		return true;
 	}
@@ -496,6 +531,7 @@ public class MainActivity extends AppCompatActivity {
 		SharedPreferences.Editor edit = pref.edit();
 		edit.putInt("nightMode", AppCompatDelegate.getDefaultNightMode());
 		edit.putInt("sampleRate", sampleRate);
+		edit.putInt("channelSelect", channelSelect);
 		edit.putInt("audioSource", audioSource);
 		edit.apply();
 	}
@@ -513,6 +549,18 @@ public class MainActivity extends AppCompatActivity {
 		}
 		if (id == R.id.action_set_rate_48000) {
 			setSampleRate(48000);
+			return true;
+		}
+		if (id == R.id.action_set_channel_default) {
+			setChannelSelect(0);
+			return true;
+		}
+		if (id == R.id.action_set_channel_first) {
+			setChannelSelect(1);
+			return true;
+		}
+		if (id == R.id.action_set_channel_second) {
+			setChannelSelect(2);
 			return true;
 		}
 		if (id == R.id.action_set_source_default) {
