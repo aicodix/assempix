@@ -1,78 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:keepScreenOn="true"
-    tools:context=".MainActivity">
-    <LinearLayout
-        tools:ignore="NestedWeights"
-        android:id="@+id/content"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-        <ImageView
-            android:id="@+id/image"
-            android:src="@drawable/ic_smpte_color_bars"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="5"
-            android:contentDescription="@string/image_description" />
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:layout_weight="7">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:baselineAligned="false"
-                android:layout_weight="7">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="3"
-                    android:orientation="vertical">
-                    <ImageView
-                        android:id="@+id/spectrum"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="5"
-                        android:contentDescription="@string/spectrum_description" />
-                    <ImageView
-                        android:id="@+id/spectrogram"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="2"
-                        android:contentDescription="@string/spectrogram_description" />
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="5"
-                    android:orientation="vertical">
-                    <ImageView
-                        android:id="@+id/constellation"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="2"
-                        android:contentDescription="@string/constellation_description" />
-                    <ImageView
-                        android:id="@+id/peak_meter"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="23"
-                        android:contentDescription="@string/peak_meter_description" />
-                </LinearLayout>
-            </LinearLayout>
-            <TextView
-                android:id="@+id/message"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="7"
-                android:gravity="center"
-                android:text="Hello World!"/>
-        </LinearLayout>
-    </LinearLayout>
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:keepScreenOn="true"
+	tools:context=".MainActivity">
+
+	<LinearLayout
+		android:id="@+id/content"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:orientation="vertical"
+		tools:ignore="NestedWeights">
+
+		<ImageView
+			android:id="@+id/image"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:layout_weight="5"
+			android:contentDescription="@string/image_description"
+			android:src="@drawable/ic_smpte_color_bars" />
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:layout_weight="7"
+			android:orientation="vertical">
+
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_weight="7"
+				android:baselineAligned="false"
+				android:orientation="horizontal">
+
+				<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="match_parent"
+					android:layout_weight="3"
+					android:orientation="vertical">
+
+					<ImageView
+						android:id="@+id/spectrum"
+						android:layout_width="match_parent"
+						android:layout_height="match_parent"
+						android:layout_weight="5"
+						android:contentDescription="@string/spectrum_description" />
+
+					<ImageView
+						android:id="@+id/spectrogram"
+						android:layout_width="match_parent"
+						android:layout_height="match_parent"
+						android:layout_weight="2"
+						android:contentDescription="@string/spectrogram_description" />
+				</LinearLayout>
+
+				<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="match_parent"
+					android:layout_weight="5"
+					android:orientation="vertical">
+
+					<ImageView
+						android:id="@+id/constellation"
+						android:layout_width="match_parent"
+						android:layout_height="match_parent"
+						android:layout_weight="2"
+						android:contentDescription="@string/constellation_description" />
+
+					<ImageView
+						android:id="@+id/peak_meter"
+						android:layout_width="match_parent"
+						android:layout_height="match_parent"
+						android:layout_weight="23"
+						android:contentDescription="@string/peak_meter_description" />
+				</LinearLayout>
+			</LinearLayout>
+
+			<TextView
+				android:id="@+id/message"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_weight="7"
+				android:gravity="center"
+				android:text="Hello World!" />
+		</LinearLayout>
+	</LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

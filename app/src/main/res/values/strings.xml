@@ -1,67 +1,67 @@
 <resources>
-    <string name="app_name">Assempix</string>
-    <string name="action_share">Share</string>
-    <string name="sample_rate">Sample Rate</string>
-    <string name="rate_8000">8000 Hz</string>
-    <string name="rate_44100">44100 Hz</string>
-    <string name="rate_48000">48000 Hz</string>
-    <string name="channel_select">Channel Select</string>
-    <string name="channel_default">Default</string>
-    <string name="channel_first">First</string>
-    <string name="channel_second">Second</string>
-    <string name="audio_source">Audio Source</string>
-    <string name="source_default">Default</string>
-    <string name="source_microphone">Microphone</string>
-    <string name="source_camcorder">Camcorder</string>
-    <string name="source_voice_recognition">Voice Recognition</string>
-    <string name="source_unprocessed">Unprocessed</string>
-    <string name="night_mode">Night Mode</string>
-    <string name="enable">Enable</string>
-    <string name="disable">Disable</string>
-    <string name="force_quit">Force Quit</string>
-    <string name="quit">Quit</string>
-    <string name="okay">Okay</string>
-    <string name="audio_init_failed">Audio initialization failed.\nTry other settings.\nForce Quit and restart might also help.</string>
-    <string name="audio_setup_failed">Audio setup failed.\nTry other settings.</string>
-    <string name="audio_permission_denied">Microphone access denied.\nCheck permissions.</string>
-    <string name="audio_recording_paused">Recording paused</string>
-    <string name="audio_recording_error">Recording audio failed.\nCheck if access is blocked.\nRestart device if necessary to gain back access.</string>
-    <string name="audio_recording_config">Sample Rate: %1$d Hz\nChannel Select: %2$s\nAudio Source: %3$s</string>
-    <string name="image_description">Decoded image</string>
-    <string name="spectrum_description">Spectrum of audio signal</string>
-    <string name="spectrogram_description">Spectrogram of audio signal</string>
-    <string name="constellation_description">Demodulated constellation points</string>
-    <string name="peak_meter_description">Peak audio signal level</string>
-    <string name="status_message">Carrier: %1$.2f Hz\nMode: %2$s\nCall: %3$s\n\n%4$s</string>
-    <string name="preamble_sync">Synchronized and receiving</string>
-    <string name="preamble_fail">Preamble failure</string>
-    <string name="preamble_nope">Ignoring preamble</string>
-    <string name="mode_unsupported">%1$d (unsupported)</string>
-    <string-array name="operation_modes">
-        <item>6 (8PSK, 2700 Hz, 10 s)</item>
-        <item>7 (8PSK, 2500 Hz, 11 s)</item>
-        <item>8 (QPSK, 2500 Hz, 16 s)</item>
-        <item>9 (QPSK, 2250 Hz, 18 s)</item>
-        <item>10 (8PSK, 3200 Hz, 9 s)</item>
-        <item>11 (8PSK, 2400 Hz, 11 s)</item>
-        <item>12 (QPSK, 2400 Hz, 16 s)</item>
-        <item>13 (QPSK, 1600 Hz, 24 s)</item>
-    </string-array>
-    <string name="heap_error">Not enough memory</string>
-    <string name="decoding_failed">Decoding failed</string>
-    <string name="payload_unknown">Payload unknown</string>
-    <string name="image_received">Image received</string>
-    <string name="creating_picture_directory_failed">Creating picture directory failed.\nCheck permissions.</string>
-    <string name="creating_picture_file_failed">Creating picture file failed.\nCheck permissions.</string>
-    <string name="storing_picture_failed">Storing picture failed</string>
-    <string name="privacy_policy">Privacy Policy</string>
-    <string name="privacy_policy_text">To be able to decode COFDMTV encoded images the app needs access to the microphone.
+	<string name="app_name">Assempix</string>
+	<string name="action_share">Share</string>
+	<string name="sample_rate">Sample Rate</string>
+	<string name="rate_8000">8000 Hz</string>
+	<string name="rate_44100">44100 Hz</string>
+	<string name="rate_48000">48000 Hz</string>
+	<string name="channel_select">Channel Select</string>
+	<string name="channel_default">Default</string>
+	<string name="channel_first">First</string>
+	<string name="channel_second">Second</string>
+	<string name="audio_source">Audio Source</string>
+	<string name="source_default">Default</string>
+	<string name="source_microphone">Microphone</string>
+	<string name="source_camcorder">Camcorder</string>
+	<string name="source_voice_recognition">Voice Recognition</string>
+	<string name="source_unprocessed">Unprocessed</string>
+	<string name="night_mode">Night Mode</string>
+	<string name="enable">Enable</string>
+	<string name="disable">Disable</string>
+	<string name="force_quit">Force Quit</string>
+	<string name="quit">Quit</string>
+	<string name="okay">Okay</string>
+	<string name="audio_init_failed">Audio initialization failed.\nTry other settings.\nForce Quit and restart might also help.</string>
+	<string name="audio_setup_failed">Audio setup failed.\nTry other settings.</string>
+	<string name="audio_permission_denied">Microphone access denied.\nCheck permissions.</string>
+	<string name="audio_recording_paused">Recording paused</string>
+	<string name="audio_recording_error">Recording audio failed.\nCheck if access is blocked.\nRestart device if necessary to gain back access.</string>
+	<string name="audio_recording_config">Sample Rate: %1$d Hz\nChannel Select: %2$s\nAudio Source: %3$s</string>
+	<string name="image_description">Decoded image</string>
+	<string name="spectrum_description">Spectrum of audio signal</string>
+	<string name="spectrogram_description">Spectrogram of audio signal</string>
+	<string name="constellation_description">Demodulated constellation points</string>
+	<string name="peak_meter_description">Peak audio signal level</string>
+	<string name="status_message">Carrier: %1$.2f Hz\nMode: %2$s\nCall: %3$s\n\n%4$s</string>
+	<string name="preamble_sync">Synchronized and receiving</string>
+	<string name="preamble_fail">Preamble failure</string>
+	<string name="preamble_nope">Ignoring preamble</string>
+	<string name="mode_unsupported">%1$d (unsupported)</string>
+	<string-array name="operation_modes">
+		<item>6 (8PSK, 2700 Hz, 10 s)</item>
+		<item>7 (8PSK, 2500 Hz, 11 s)</item>
+		<item>8 (QPSK, 2500 Hz, 16 s)</item>
+		<item>9 (QPSK, 2250 Hz, 18 s)</item>
+		<item>10 (8PSK, 3200 Hz, 9 s)</item>
+		<item>11 (8PSK, 2400 Hz, 11 s)</item>
+		<item>12 (QPSK, 2400 Hz, 16 s)</item>
+		<item>13 (QPSK, 1600 Hz, 24 s)</item>
+	</string-array>
+	<string name="heap_error">Not enough memory</string>
+	<string name="decoding_failed">Decoding failed</string>
+	<string name="payload_unknown">Payload unknown</string>
+	<string name="image_received">Image received</string>
+	<string name="creating_picture_directory_failed">Creating picture directory failed.\nCheck permissions.</string>
+	<string name="creating_picture_file_failed">Creating picture file failed.\nCheck permissions.</string>
+	<string name="storing_picture_failed">Storing picture failed</string>
+	<string name="privacy_policy">Privacy Policy</string>
+	<string name="privacy_policy_text">To be able to decode COFDMTV encoded images the app needs access to the microphone.
 Having access to the microphone is considered to be a sensitive permission and you have the right to know what the app does with that access:
 The data recorded from the microphone is only used to fed the COFDMTV decoder, VU meter and the spectrum analyzer for visualization of its frequency content.
 The app uses a very small temporary buffer in volatile memory and constantly overwrites this buffer with new data from the microphone.
 The resulting images from the COFDMTV decoder is the only data that gets stored in persistent storage on your Android device.</string>
-    <string name="about">About Assempix</string>
-    <string name="about_text">Assempix %1$s\nCopyright 2021 aicodix GmbH
+	<string name="about">About Assempix</string>
+	<string name="about_text">Assempix %1$s\nCopyright 2021 aicodix GmbH
 \n\nPlease read the disclaimer at the bottom of this page.
 \n\nAssempix decodes COFDMTV encoded audio signals to images and is based on open-source software:
 \n\nOFDM modem decoder and specification:\nhttps://github.com/aicodix/modem\nBSD Zero Clause License
