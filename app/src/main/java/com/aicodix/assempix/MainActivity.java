@@ -418,6 +418,16 @@ public class MainActivity extends AppCompatActivity {
 		super.onSaveInstanceState(state);
 	}
 
+	private void storeSettings() {
+		SharedPreferences pref = getPreferences(Context.MODE_PRIVATE);
+		SharedPreferences.Editor edit = pref.edit();
+		edit.putInt("nightMode", AppCompatDelegate.getDefaultNightMode());
+		edit.putInt("sampleRate", sampleRate);
+		edit.putInt("channelSelect", channelSelect);
+		edit.putInt("audioSource", audioSource);
+		edit.apply();
+	}
+
 	@Override
 	protected void onCreate(Bundle state) {
 		final int defaultSampleRate = 8000;
@@ -536,16 +546,6 @@ public class MainActivity extends AppCompatActivity {
 		updateChannelSelectMenu();
 		updateAudioSourceMenu();
 		return true;
-	}
-
-	private void storeSettings() {
-		SharedPreferences pref = getPreferences(Context.MODE_PRIVATE);
-		SharedPreferences.Editor edit = pref.edit();
-		edit.putInt("nightMode", AppCompatDelegate.getDefaultNightMode());
-		edit.putInt("sampleRate", sampleRate);
-		edit.putInt("channelSelect", channelSelect);
-		edit.putInt("audioSource", audioSource);
-		edit.apply();
 	}
 
 	@Override
