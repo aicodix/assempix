@@ -279,12 +279,24 @@ public class MainActivity extends AppCompatActivity {
 		return "";
 	}
 
+	private String getChannelSelectString(int channelSelect) {
+		switch (channelSelect) {
+			case 0:
+				return getString(R.string.channel_default);
+			case 1:
+				return getString(R.string.channel_first);
+			case 2:
+				return getString(R.string.channel_second);
+		}
+		return "";
+	}
+
 	private void startListening() {
 		if (audioRecord != null) {
 			audioRecord.startRecording();
 			if (audioRecord.getRecordingState() == AudioRecord.RECORDSTATE_RECORDING) {
 				audioRecord.read(audioBuffer, 0, audioBuffer.length);
-				binding.message.setText(getString(R.string.audio_recording_config, sampleRate, getAudioSourceString(audioSource)));
+				binding.message.setText(getString(R.string.audio_recording_config, sampleRate, getChannelSelectString(channelSelect), getAudioSourceString(audioSource)));
 			} else {
 				binding.message.setText(getString(R.string.audio_recording_error));
 			}

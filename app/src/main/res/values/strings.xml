@@ -26,7 +26,7 @@
     <string name="audio_permission_denied">Microphone access denied.\nCheck permissions.</string>
     <string name="audio_recording_paused">Recording paused</string>
     <string name="audio_recording_error">Recording audio failed.\nCheck if access is blocked.\nRestart device if necessary to gain back access.</string>
-    <string name="audio_recording_config">Sample Rate: %1$d Hz\nAudio Source: %2$s</string>
+    <string name="audio_recording_config">Sample Rate: %1$d Hz\nChannel Select: %2$s\nAudio Source: %3$s</string>
     <string name="image_description">Decoded image</string>
     <string name="spectrum_description">Spectrum of audio signal</string>
     <string name="spectrogram_description">Spectrogram of audio signal</string>
