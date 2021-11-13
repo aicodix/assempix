@@ -9,6 +9,7 @@
 	<string name="channel_default">Default</string>
 	<string name="channel_first">First</string>
 	<string name="channel_second">Second</string>
+	<string name="channel_summation">Summation</string>
 	<string name="audio_source">Audio Source</string>
 	<string name="source_default">Default</string>
 	<string name="source_microphone">Microphone</string>

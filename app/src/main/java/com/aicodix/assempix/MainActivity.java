@@ -67,8 +67,6 @@ public class MainActivity extends AppCompatActivity {
 	private int sampleRate;
 	private int channelSelect;
 	private int audioSource;
-	private int channelCount;
-	private int channelIndex;
 	private short[] audioBuffer;
 	private ActivityMainBinding binding;
 	private Menu menu;
@@ -84,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
 	private byte[] payload;
 	private String callTrim;
 
-	private native int processDecoder(int[] spectrumPixels, int[] spectrogramPixels, int[] constellationPixels, int[] peakMeterPixels, short[] audioBuffer, int channelCount, int channelIndex);
+	private native int processDecoder(int[] spectrumPixels, int[] spectrogramPixels, int[] constellationPixels, int[] peakMeterPixels, short[] audioBuffer, int channelSelect);
 
 	private native void cachedDecoder(float[] carrierFrequencyOffset, int[] operationMode, byte[] callSign);
 
@@ -103,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
 		@Override
 		public void onPeriodicNotification(AudioRecord audioRecord) {
 			audioRecord.read(audioBuffer, 0, audioBuffer.length);
-			int status = processDecoder(spectrumPixels, spectrogramPixels, constellationPixels, peakMeterPixels, audioBuffer, channelCount, channelIndex);
+			int status = processDecoder(spectrumPixels, spectrogramPixels, constellationPixels, peakMeterPixels, audioBuffer, channelSelect);
 			spectrumBitmap.setPixels(spectrumPixels, 0, spectrumWidth, 0, 0, spectrumWidth, spectrumHeight);
 			spectrogramBitmap.setPixels(spectrogramPixels, 0, spectrogramWidth, 0, 0, spectrogramWidth, spectrogramHeight);
 			constellationBitmap.setPixels(constellationPixels, 0, constellationWidth, 0, 0, constellationWidth, constellationHeight);
@@ -287,6 +285,8 @@ public class MainActivity extends AppCompatActivity {
 				return getString(R.string.channel_first);
 			case 2:
 				return getString(R.string.channel_second);
+			case 3:
+				return getString(R.string.channel_summation);
 		}
 		return "";
 	}
@@ -313,8 +313,7 @@ public class MainActivity extends AppCompatActivity {
 	private void initAudioRecord(boolean restart) {
 		if (audioRecord != null) {
 			boolean rateChanged = audioRecord.getSampleRate() != sampleRate;
-			boolean channelChanged = channelSelect == 0 ? audioRecord.getChannelCount() != 1 :
-				(audioRecord.getChannelCount() != 2 || channelIndex != channelSelect - 1);
+			boolean channelChanged = audioRecord.getChannelCount() != (channelSelect == 0 ? 1 : 2);
 			boolean sourceChanged = audioRecord.getAudioSource() != audioSource;
 			if (!rateChanged && !channelChanged && !sourceChanged)
 				return;
@@ -323,10 +322,8 @@ public class MainActivity extends AppCompatActivity {
 			audioRecord = null;
 		}
 		int channelConfig = AudioFormat.CHANNEL_IN_MONO;
-		channelIndex = 0;
-		channelCount = 1;
-		if (channelSelect > 0 && channelSelect < 3) {
-			channelIndex = channelSelect - 1;
+		int channelCount = 1;
+		if (channelSelect != 0) {
 			channelCount = 2;
 			channelConfig = AudioFormat.CHANNEL_IN_STEREO;
 		}
@@ -513,6 +510,9 @@ public class MainActivity extends AppCompatActivity {
 			case 2:
 				menu.findItem(R.id.action_set_channel_second).setChecked(true);
 				break;
+			case 3:
+				menu.findItem(R.id.action_set_channel_summation).setChecked(true);
+				break;
 		}
 	}
 
@@ -573,6 +573,10 @@ public class MainActivity extends AppCompatActivity {
 		}
 		if (id == R.id.action_set_channel_second) {
 			setChannelSelect(2);
+			return true;
+		}
+		if (id == R.id.action_set_channel_summation) {
+			setChannelSelect(3);
 			return true;
 		}
 		if (id == R.id.action_set_source_default) {
