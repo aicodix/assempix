@@ -162,6 +162,7 @@ class Decoder : public Interface {
 					peak = std::max(peak, std::abs((int) samples[i]));
 				break;
 			case 3:
+			case 4:
 				for (int i = 0; i < 2 * extended_length; ++i)
 					peak = std::max(peak, std::abs((int) samples[i]));
 				break;
@@ -225,20 +226,17 @@ class Decoder : public Interface {
 	}
 
 	const cmplx *next_sample(const int16_t *samples, int channel, int i) {
-		float real;
 		switch (channel) {
 			case 1:
+				return buffer(analytic(samples[2 * i] / 32768.f));
 			case 2:
-				real = samples[2 * i + channel - 1] / 32768.f;
-				break;
+				return buffer(analytic(samples[2 * i + 1] / 32768.f));
 			case 3:
-				real = ((int)samples[2 * i + 0] + (int)samples[2 * i + 1]) / 65536.f;
-				break;
-			default:
-				real = samples[i] / 32768.f;
-
+				return buffer(analytic(((int)samples[2 * i] + (int)samples[2 * i + 1]) / 65536.f));
+			case 4:
+				return buffer(cmplx(samples[2 * i], samples[2 * i + 1]) / 32768.f);
 		}
-		return buffer(analytic(real));
+		return buffer(analytic(samples[i] / 32768.f));
 	}
 
 	cmplx mod_map(float *b) {

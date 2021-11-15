@@ -287,6 +287,8 @@ public class MainActivity extends AppCompatActivity {
 				return getString(R.string.channel_second);
 			case 3:
 				return getString(R.string.channel_summation);
+			case 4:
+				return getString(R.string.channel_analytic);
 		}
 		return "";
 	}
@@ -513,6 +515,9 @@ public class MainActivity extends AppCompatActivity {
 			case 3:
 				menu.findItem(R.id.action_set_channel_summation).setChecked(true);
 				break;
+			case 4:
+				menu.findItem(R.id.action_set_channel_analytic).setChecked(true);
+				break;
 		}
 	}
 
@@ -577,6 +582,10 @@ public class MainActivity extends AppCompatActivity {
 		}
 		if (id == R.id.action_set_channel_summation) {
 			setChannelSelect(3);
+			return true;
+		}
+		if (id == R.id.action_set_channel_analytic) {
+			setChannelSelect(4);
 			return true;
 		}
 		if (id == R.id.action_set_source_default) {

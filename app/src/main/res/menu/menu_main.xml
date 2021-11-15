@@ -37,6 +37,9 @@
 				<item
 					android:id="@+id/action_set_channel_summation"
 					android:title="@string/channel_summation" />
+				<item
+					android:id="@+id/action_set_channel_analytic"
+					android:title="@string/channel_analytic" />
 			</group>
 		</menu>
 	</item>
