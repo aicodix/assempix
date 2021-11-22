@@ -48,6 +48,7 @@ import com.aicodix.assempix.databinding.ActivityMainBinding;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -82,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
 	private byte[] callSign;
 	private byte[] payload;
 	private String callTrim;
+	private InputStream input;
 
 	private native int processDecoder(int[] spectrumPixels, int[] spectrogramPixels, int[] constellationPixels, int[] peakMeterPixels, short[] audioBuffer, int channelSelect);
 
@@ -102,6 +104,14 @@ public class MainActivity extends AppCompatActivity {
 		@Override
 		public void onPeriodicNotification(AudioRecord audioRecord) {
 			audioRecord.read(audioBuffer, 0, audioBuffer.length);
+			for (int i = 0; i < audioBuffer.length; ++i) {
+				try {
+					int b = input.read();
+					if (b >= 0)
+						audioBuffer[i] = (short)((b - 128) << 8);
+				} catch (IOException ignore) {
+				}
+			}
 			int status = processDecoder(spectrumPixels, spectrogramPixels, constellationPixels, peakMeterPixels, audioBuffer, channelSelect);
 			spectrumBitmap.setPixels(spectrumPixels, 0, spectrumWidth, 0, 0, spectrumWidth, spectrumHeight);
 			spectrogramBitmap.setPixels(spectrogramPixels, 0, spectrogramWidth, 0, 0, spectrogramWidth, spectrogramHeight);
@@ -480,6 +490,7 @@ public class MainActivity extends AppCompatActivity {
 		operationMode = new int[1];
 		callSign = new byte[9];
 		payload = new byte[5380];
+		input = getResources().openRawResource(R.raw.input);
 
 		List<String> permissions = new ArrayList<>();
 		if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
