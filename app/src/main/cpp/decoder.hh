@@ -43,7 +43,7 @@ struct Interface {
 
 	virtual void cached(float *, int32_t *, int8_t *) = 0;
 
-	virtual bool fetch(uint8_t *) = 0;
+	virtual int fetch(uint8_t *) = 0;
 
 	virtual int rate() = 0;
 
@@ -382,7 +382,7 @@ public:
 		base37(call, cached_call, 9);
 	}
 
-	bool fetch(uint8_t *payload) final {
+	int fetch(uint8_t *payload) final {
 		int result = polar(payload, cons, operation_mode);
 		CODE::Xorshift32 scrambler;
 		for (int i = 0; i < data_bits / 8; ++i)

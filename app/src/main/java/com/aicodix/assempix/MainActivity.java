@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
 	private int sampleRate;
 	private int channelSelect;
 	private int audioSource;
+	private int bitFlips;
 	private short[] audioBuffer;
 	private ActivityMainBinding binding;
 	private Menu menu;
@@ -86,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
 
 	private native void cachedDecoder(float[] carrierFrequencyOffset, int[] operationMode, byte[] callSign);
 
-	private native boolean fetchDecoder(byte[] payload);
+	private native int fetchDecoder(byte[] payload);
 
 	private native boolean createDecoder(int sampleRate);
 
@@ -139,7 +140,8 @@ public class MainActivity extends AppCompatActivity {
 					statusMessage(R.string.preamble_sync);
 					break;
 				case STATUS_DONE:
-					if (fetchDecoder(payload))
+					bitFlips = fetchDecoder(payload);
+					if (bitFlips >= 0)
 						decodePayload();
 					else
 						statusMessage(R.string.decoding_failed);
@@ -155,8 +157,13 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	private void statusMessage(int status) {
+		String statMsg;
+		if (status == R.string.image_received)
+			statMsg = getString(status, bitFlips);
+		else
+			statMsg = getString(status);
 		if (callTrim != null)
-			binding.message.setText(getString(R.string.status_message, carrierFrequencyOffset[0], modeString(operationMode[0]), callTrim, getString(status)));
+			binding.message.setText(getString(R.string.status_message, carrierFrequencyOffset[0], modeString(operationMode[0]), callTrim, statMsg));
 		else
 			binding.message.setText(getString(status));
 	}

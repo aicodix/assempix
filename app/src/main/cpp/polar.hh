@@ -172,7 +172,7 @@ class Polar {
 public:
 	Polar() : crc(0xD419CC15) {}
 
-	bool operator()(uint8_t *message, const cmplx *cons, int operation_mode) {
+	int operator()(uint8_t *message, const cmplx *cons, int operation_mode) {
 		prepare(operation_mode);
 		float prec = 1;
 		if (std::is_integral<code_type>::value)
@@ -198,10 +198,17 @@ public:
 			}
 		}
 		if (best < 0)
-			return false;
+			return -1;
 
-		for (int i = 0; i < data_bits; ++i)
-			CODE::set_le_bit(message, i, mesg[i].v[best] < 0);
-		return true;
+		int flips = 0;
+		for (int i = 0, j = 0; i < data_bits; ++i, ++j) {
+			while ((frozen_bits[j / 32] >> (j % 32)) & 1)
+				++j;
+			bool received = code[j] < 0;
+			bool decoded = mesg[i].v[best] < 0;
+			flips += received != decoded;
+			CODE::set_le_bit(message, i, decoded);
+		}
+		return flips;
 	}
 };
