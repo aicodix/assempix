@@ -54,6 +54,7 @@ template<int RATE>
 class Decoder : public Interface {
 	typedef DSP::Complex<float> cmplx;
 	typedef DSP::Const<float> Const;
+	typedef float code_type;
 	static const int spectrum_width = 640, spectrum_height = 64;
 	static const int spectrogram_width = 640, spectrogram_height = 256;
 	static const int constellation_width = 64, constellation_height = 64;
@@ -83,9 +84,10 @@ class Decoder : public Interface {
 	DSP::Phasor<cmplx> osc;
 	CODE::CRC<uint16_t> crc;
 	CODE::OrderedStatisticsDecoder<255, 71, 2> osd;
-	Polar polar;
-	cmplx temp[extended_length], freq[symbol_length], prev[carrier_count_max], cons[32400];
+	Polar<code_type> polar;
+	cmplx temp[extended_length], freq[symbol_length], prev[carrier_count_max], cons[carrier_count_max];
 	float power[spectrum_width]{}, index[carrier_count_max]{}, phase[carrier_count_max]{};
+	code_type code[65536];
 	int8_t generator[255 * 71];
 	int8_t soft[pre_seq_len];
 	uint8_t data[(pre_seq_len + 7) / 8];
@@ -207,8 +209,8 @@ class Decoder : public Interface {
 		Image<uint32_t, constellation_width, constellation_height> img(pixels);
 		img.fill(0);
 		for (int i = 0; i < carrier_count; ++i) {
-			float real = cons[symbol_number * carrier_count + i].real();
-			float imag = cons[symbol_number * carrier_count + i].imag();
+			float real = cons[i].real();
+			float imag = cons[i].imag();
 			if (real != 0 && imag != 0)
 				img.set((real + 2) * img.width / 4, (imag + 2) * img.height / 4, -1);
 		}
@@ -239,23 +241,34 @@ class Decoder : public Interface {
 		return buffer(analytic(samples[i] / 32768.f));
 	}
 
-	cmplx mod_map(float *b) {
+	cmplx mod_map(code_type *b) {
 		switch (mod_bits) {
 			case 2:
-				return PhaseShiftKeying<4, cmplx, float>::map(b);
+				return PhaseShiftKeying<4, cmplx, code_type>::map(b);
 			case 3:
-				return PhaseShiftKeying<8, cmplx, float>::map(b);
+				return PhaseShiftKeying<8, cmplx, code_type>::map(b);
 		}
 		return 0;
 	}
 
-	void mod_hard(float *b, cmplx c) {
+	void mod_hard(code_type *b, cmplx c) {
 		switch (mod_bits) {
 			case 2:
-				PhaseShiftKeying<4, cmplx, float>::hard(b, c);
+				PhaseShiftKeying<4, cmplx, code_type>::hard(b, c);
 				break;
 			case 3:
-				PhaseShiftKeying<8, cmplx, float>::hard(b, c);
+				PhaseShiftKeying<8, cmplx, code_type>::hard(b, c);
+				break;
+		}
+	}
+
+	void mod_soft(code_type *b, cmplx c, float precision) {
+		switch (mod_bits) {
+			case 2:
+				PhaseShiftKeying<4, cmplx, code_type>::soft(b, c, precision);
+				break;
+			case 3:
+				PhaseShiftKeying<8, cmplx, code_type>::soft(b, c, precision);
 				break;
 		}
 	}
@@ -263,9 +276,9 @@ class Decoder : public Interface {
 	void compensate() {
 		int count = 0;
 		for (int i = 0; i < carrier_count; ++i) {
-			cmplx con = cons[symbol_number * carrier_count + i];
+			cmplx con = cons[i];
 			if (con.real() != 0 && con.imag() != 0) {
-				float tmp[mod_bits_max];
+				code_type tmp[mod_bits_max];
 				mod_hard(tmp, con);
 				index[count] = i + carrier_offset;
 				phase[count] = arg(con * conj(mod_map(tmp)));
@@ -274,7 +287,29 @@ class Decoder : public Interface {
 		}
 		tse.compute(index, phase, count);
 		for (int i = 0; i < carrier_count; ++i)
-			cons[symbol_number * carrier_count + i] *= DSP::polar<float>(1, -tse(i + carrier_offset));
+			cons[i] *= DSP::polar<float>(1, -tse(i + carrier_offset));
+	}
+
+	float precision() {
+		float sp = 0, np = 0;
+		for (int i = 0; i < carrier_count; ++i) {
+			code_type tmp[mod_bits_max];
+			mod_hard(tmp, cons[i]);
+			cmplx hard = mod_map(tmp);
+			cmplx error = cons[i] - hard;
+			sp += norm(hard);
+			np += norm(error);
+		}
+		// $LLR=log(\frac{p(x=+1|y)}{p(x=-1|y)})$
+		// $p(x|\mu,\sigma)=\frac{1}{\sqrt{2\pi}\sigma}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}$
+		float sigma = std::sqrt(np / (2 * sp));
+		return 1 / (sigma * sigma);
+	}
+
+	void demap() {
+		float prec = precision();
+		for (int i = 0; i < carrier_count; ++i)
+			mod_soft(code + mod_bits * (symbol_number * carrier_count + i), cons[i], prec);
 	}
 
 	int preamble(const cmplx *buf) {
@@ -383,7 +418,7 @@ public:
 	}
 
 	int fetch(uint8_t *payload) final {
-		int result = polar(payload, cons, operation_mode);
+		int result = polar(payload, code, operation_mode);
 		CODE::Xorshift32 scrambler;
 		for (int i = 0; i < data_bits / 8; ++i)
 			payload[i] ^= scrambler();
@@ -415,8 +450,9 @@ public:
 		update_spectrogram(spectrogram_pixels);
 		if (status != STATUS_SYNC && symbol_number < symbol_count) {
 			for (int i = 0; i < carrier_count; ++i)
-				cons[symbol_number * carrier_count + i] = demod_or_erase(freq[bin(i + carrier_offset)], prev[i]);
+				cons[i] = demod_or_erase(freq[bin(i + carrier_offset)], prev[i]);
 			compensate();
+			demap();
 			update_constellation(constellation_pixels);
 			if (++symbol_number == symbol_count)
 				status = STATUS_DONE;
