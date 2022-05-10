@@ -300,10 +300,7 @@ class Decoder : public Interface {
 			sp += norm(hard);
 			np += norm(error);
 		}
-		// $LLR=log(\frac{p(x=+1|y)}{p(x=-1|y)})$
-		// $p(x|\mu,\sigma)=\frac{1}{\sqrt{2\pi}\sigma}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}$
-		float sigma = std::sqrt(np / (2 * sp));
-		return 1 / (sigma * sigma);
+		return sp / np;
 	}
 
 	void demap() {
