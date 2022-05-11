@@ -29,6 +29,12 @@ Java_com_aicodix_assempix_MainActivity_createDecoder(
 		case 8000:
 			decoder = new(std::nothrow) Decoder<8000>();
 			break;
+		case 16000:
+			decoder = new(std::nothrow) Decoder<16000>();
+			break;
+		case 32000:
+			decoder = new(std::nothrow) Decoder<32000>();
+			break;
 		case 44100:
 			decoder = new(std::nothrow) Decoder<44100>();
 			break;

@@ -3,6 +3,8 @@
 	<string name="action_share">Share</string>
 	<string name="sample_rate">Sample Rate</string>
 	<string name="rate_8000">8000 Hz</string>
+	<string name="rate_16000">16000 Hz</string>
+	<string name="rate_32000">32000 Hz</string>
 	<string name="rate_44100">44100 Hz</string>
 	<string name="rate_48000">48000 Hz</string>
 	<string name="channel_select">Channel Select</string>
