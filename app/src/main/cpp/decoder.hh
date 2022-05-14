@@ -56,7 +56,7 @@ class Decoder : public Interface {
 	typedef DSP::Const<float> Const;
 	typedef float code_type;
 	static const int spectrum_width = 640, spectrum_height = 64;
-	static const int spectrogram_width = 640, spectrogram_height = 256;
+	static const int spectrogram_width = 640, spectrogram_height = 64;
 	static const int constellation_width = 64, constellation_height = 64;
 	static const int peak_meter_width = 16;//, peak_meter_height = 1;
 	static const int symbol_length = (1280 * RATE) / 8000;

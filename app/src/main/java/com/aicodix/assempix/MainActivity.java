@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
 	private ActivityMainBinding binding;
 	private Menu menu;
 	private final int spectrumWidth = 640, spectrumHeight = 64;
-	private final int spectrogramWidth = 640, spectrogramHeight = 256;
+	private final int spectrogramWidth = 640, spectrogramHeight = 64;
 	private final int constellationWidth = 64, constellationHeight = 64;
 	private final int peakMeterWidth = 16, peakMeterHeight = 1;
 	private Bitmap spectrumBitmap, spectrogramBitmap, constellationBitmap, peakMeterBitmap;
