@@ -20,6 +20,8 @@ namespace DSP { using std::abs; using std::min; using std::cos; using std::sin; 
 #include "complex.hh"
 #include "hilbert.hh"
 #include "blockdc.hh"
+#include "window.hh"
+#include "coeffs.hh"
 #include "bitman.hh"
 #include "phasor.hh"
 #include "const.hh"
@@ -82,6 +84,8 @@ class Decoder : public Interface {
 	DSP::BipBuffer<cmplx, buffer_length> buffer;
 	DSP::TheilSenEstimator<float, carrier_count_max> tse;
 	DSP::Phasor<cmplx> osc;
+	DSP::Hann<float> hann;
+	DSP::Coeffs<symbol_length, float> window;
 	CODE::CRC<uint16_t> crc;
 	CODE::OrderedStatisticsDecoder<255, 71, 2> osd;
 	Polar<code_type> polar;
@@ -392,7 +396,7 @@ class Decoder : public Interface {
 	}
 
 public:
-	Decoder() : correlator(corSeq()), crc(0xA8F4) {
+	Decoder() : correlator(corSeq()), crc(0xA8F4), window(&hann) {
 		CODE::BoseChaudhuriHocquenghemGenerator<255, 71>::matrix(generator, true, {
 			0b100011101, 0b101110111, 0b111110011, 0b101101001,
 			0b110111101, 0b111100111, 0b100101011, 0b111010111,
@@ -440,12 +444,8 @@ public:
 		}
 		for (int i = 0; i < extended_length; ++i)
 			temp[i] = buf[symbol_position + i] * osc();
-		fwd(freq, temp);
-		for (int i = 0; i < spectrum_width; ++i)
-			power[i] = std::clamp<float>((DSP::decibel(norm(freq[bin(i - spectrum_width / 2)] / float(symbol_length))) - dB_min) / (dB_max - dB_min), 0, 1);
-		update_spectrum(spectrum_pixels);
-		update_spectrogram(spectrogram_pixels);
 		if (status != STATUS_SYNC && symbol_number < symbol_count) {
+			fwd(freq, temp);
 			for (int i = 0; i < carrier_count; ++i)
 				cons[i] = demod_or_erase(freq[bin(i + carrier_offset)], prev[i]);
 			compensate();
@@ -455,7 +455,15 @@ public:
 				status = STATUS_DONE;
 		} else {
 			update_oscilloscope(constellation_pixels);
+			if (status != STATUS_SYNC)
+				for (int i = 0; i < symbol_length; ++i)
+					temp[i] *= window[i];
+			fwd(freq, temp);
 		}
+		for (int i = 0; i < spectrum_width; ++i)
+			power[i] = std::clamp<float>((DSP::decibel(norm(freq[bin(i - spectrum_width / 2)] / float(symbol_length))) - dB_min) / (dB_max - dB_min), 0, 1);
+		update_spectrum(spectrum_pixels);
+		update_spectrogram(spectrogram_pixels);
 		if (symbol_number < symbol_count)
 			for (int i = 0; i < carrier_count; ++i)
 				prev[i] = freq[bin(i + carrier_offset)];
