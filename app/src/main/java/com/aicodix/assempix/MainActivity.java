@@ -207,6 +207,7 @@ public class MainActivity extends AppCompatActivity {
 				FileOutputStream stream = new FileOutputStream(descriptor.getFileDescriptor());
 				stream.write(payload);
 				stream.close();
+				descriptor.close();
 			} catch (IOException e) {
 				statusMessage(R.string.storing_picture_failed);
 				return;
