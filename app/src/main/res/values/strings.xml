@@ -59,11 +59,11 @@
 	<string name="creating_picture_file_failed">Creating picture file failed.\nCheck permissions.</string>
 	<string name="storing_picture_failed">Storing picture failed</string>
 	<string name="privacy_policy">Privacy Policy</string>
-	<string name="privacy_policy_text">To be able to decode COFDMTV encoded images the app needs access to the microphone.
-Having access to the microphone is considered to be a sensitive permission and you have the right to know what the app does with that access:
-The data recorded from the microphone is only used to fed the COFDMTV decoder, VU meter and the spectrum analyzer for visualization of its frequency content.
-The app uses a very small temporary buffer in volatile memory and constantly overwrites this buffer with new data from the microphone.
-The resulting images from the COFDMTV decoder is the only data that gets stored in persistent storage on your Android device.</string>
+	<string name="privacy_policy_text">To be able to decode COFDMTV encoded images, Assempix needs access to the microphone.
+Having access to the microphone is considered to be a sensitive permission and you have the right to know what Assempix does with that access:
+The data recorded from the microphone is only used to feed the COFDMTV decoder, VU meter and the spectrum analyzer for visualization of its frequency content.
+Assempix uses a very small temporary buffer in volatile memory and constantly overwrites that buffer with new data from the microphone.
+The resulting images from the COFDMTV decoder is the only data that gets stored in persistent storage on your device.</string>
 	<string name="about">About Assempix</string>
 	<string name="about_text">Assempix %1$s\nCopyright 2021 aicodix GmbH
 \n\nPlease read the disclaimer at the bottom of this page.
