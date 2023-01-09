@@ -65,7 +65,7 @@ class Decoder : public Interface {
 	static const int symbol_length = (1280 * RATE) / 8000;
 	static const int guard_length = symbol_length / 8;
 	static const int extended_length = symbol_length + guard_length;
-	static const int filter_length = (((21 * RATE) / 8000) & ~3) | 1;
+	static const int filter_length = (((33 * RATE) / 8000) & ~3) | 1;
 	static const int dB_min = -96, dB_max = 0;
 	static const int carrier_count_max = 512;
 	static const int data_bits = 43040;
