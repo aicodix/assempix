@@ -22,11 +22,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.PorterDuff;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
@@ -68,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
 	private int channelSelect;
 	private int audioSource;
 	private int bitFlips;
+	private int colorTint;
 	private short[] audioBuffer;
 	private ActivityMainBinding binding;
 	private Menu menu;
@@ -83,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
 	private byte[] payload;
 	private String callTrim;
 
-	private native int processDecoder(int[] spectrumPixels, int[] spectrogramPixels, int[] constellationPixels, int[] peakMeterPixels, short[] audioBuffer, int channelSelect);
+	private native int processDecoder(int[] spectrumPixels, int[] spectrogramPixels, int[] constellationPixels, int[] peakMeterPixels, short[] audioBuffer, int channelSelect, int colorTint);
 
 	private native void cachedDecoder(float[] carrierFrequencyOffset, int[] operationMode, byte[] callSign);
 
@@ -102,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
 		@Override
 		public void onPeriodicNotification(AudioRecord audioRecord) {
 			audioRecord.read(audioBuffer, 0, audioBuffer.length);
-			int status = processDecoder(spectrumPixels, spectrogramPixels, constellationPixels, peakMeterPixels, audioBuffer, channelSelect);
+			int status = processDecoder(spectrumPixels, spectrogramPixels, constellationPixels, peakMeterPixels, audioBuffer, channelSelect, colorTint);
 			spectrumBitmap.setPixels(spectrumPixels, 0, spectrumWidth, 0, 0, spectrumWidth, spectrumHeight);
 			spectrogramBitmap.setPixels(spectrogramPixels, 0, spectrogramWidth, 0, 0, spectrogramWidth, spectrogramHeight);
 			constellationBitmap.setPixels(constellationPixels, 0, constellationWidth, 0, 0, constellationWidth, constellationHeight);
@@ -456,11 +455,7 @@ public class MainActivity extends AppCompatActivity {
 		binding = ActivityMainBinding.inflate(getLayoutInflater());
 		changeLayoutOrientation(getResources().getConfiguration());
 		setContentView(binding.getRoot());
-		ColorStateList tint = ContextCompat.getColorStateList(this, R.color.tint);
-		binding.spectrum.setImageTintList(tint);
-		binding.constellation.setImageTintList(tint);
-		binding.spectrum.setImageTintMode(PorterDuff.Mode.SRC_IN);
-		binding.constellation.setImageTintMode(PorterDuff.Mode.SRC_IN);
+		colorTint = ContextCompat.getColor(this, R.color.tint);
 		spectrumBitmap = Bitmap.createBitmap(spectrumWidth, spectrumHeight, Bitmap.Config.ARGB_8888);
 		spectrogramBitmap = Bitmap.createBitmap(spectrogramWidth, spectrogramHeight, Bitmap.Config.ARGB_8888);
 		constellationBitmap = Bitmap.createBitmap(constellationWidth, constellationHeight, Bitmap.Config.ARGB_8888);

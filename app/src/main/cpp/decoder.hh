@@ -42,7 +42,7 @@ namespace DSP { using std::abs; using std::min; using std::cos; using std::sin; 
 #define STATUS_NOPE 5
 
 struct Interface {
-	virtual int process(uint32_t *, uint32_t *, uint32_t *, uint32_t *, const int16_t *, int) = 0;
+	virtual int process(uint32_t *, uint32_t *, uint32_t *, uint32_t *, const int16_t *, int, int) = 0;
 
 	virtual void cached(float *, int32_t *, int8_t *) = 0;
 
@@ -114,6 +114,9 @@ class Decoder : public Interface {
 		r = std::clamp<float>(r, 0, 1);
 		g = std::clamp<float>(g, 0, 1);
 		b = std::clamp<float>(b, 0, 1);
+		r *= a;
+		g *= a;
+		b *= a;
 		r = std::sqrt(r);
 		g = std::sqrt(g);
 		b = std::sqrt(b);
@@ -195,14 +198,15 @@ class Decoder : public Interface {
 		}
 	}
 
-	void update_spectrum(uint32_t *pixels) {
+	void update_spectrum(uint32_t *pixels, uint32_t tint) {
 		Image<uint32_t, spectrum_width, spectrum_height> img(pixels);
 		img.fill(0);
 		auto pos = [this, img](int i) {
 			return (int) std::nearbyint((1 - power[i]) * (img.height - 1));
 		};
+		tint |= 0xff000000;
 		for (int i = 1, j = pos(0), k; i < img.width; ++i, j = k)
-			img.line(i - 1, j, i, k = pos(i), -1);
+			img.line(i - 1, j, i, k = pos(i), tint);
 	}
 
 	void update_spectrogram(uint32_t *pixels) {
@@ -211,22 +215,24 @@ class Decoder : public Interface {
 			pixels[i] = rainbow(power[i]);
 	}
 
-	void update_constellation(uint32_t *pixels) {
+	void update_constellation(uint32_t *pixels, uint32_t tint) {
 		Image<uint32_t, constellation_width, constellation_height> img(pixels);
 		img.fill(0);
+		tint |= 0xff000000;
 		for (int i = 0; i < carrier_count; ++i) {
 			float real = cons[i].real();
 			float imag = cons[i].imag();
 			if (real != 0 && imag != 0)
-				img.set((real + 2) * img.width / 4, (imag + 2) * img.height / 4, -1);
+				img.set((real + 2) * img.width / 4, (imag + 2) * img.height / 4, tint);
 		}
 	}
 
-	void update_oscilloscope(uint32_t *pixels) {
+	void update_oscilloscope(uint32_t *pixels, uint32_t tint) {
 		Image<uint32_t, constellation_width, constellation_height> img(pixels);
 		img.fill(0);
+		tint |= 0xff000000;
 		for (int i = 0; i < extended_length; ++i)
-			img.set((temp[i].real() + 1) * img.width / 2, (temp[i].imag() + 1) * img.height / 2, -1);
+			img.set((temp[i].real() + 1) * img.width / 2, (temp[i].imag() + 1) * img.height / 2, tint);
 	}
 
 	cmplx analytic(float real) {
@@ -428,7 +434,7 @@ public:
 		return result;
 	}
 
-	int process(uint32_t *spectrum_pixels, uint32_t *spectrogram_pixels, uint32_t *constellation_pixels, uint32_t *peak_meter_pixels, const int16_t *audio_buffer, int channel_select) final {
+	int process(uint32_t *spectrum_pixels, uint32_t *spectrogram_pixels, uint32_t *constellation_pixels, uint32_t *peak_meter_pixels, const int16_t *audio_buffer, int channel_select, int color_tint) final {
 		update_peak_meter(peak_meter_pixels, audio_buffer, channel_select);
 		int status = STATUS_OKAY;
 		const cmplx *buf;
@@ -447,7 +453,7 @@ public:
 		for (int i = 0; i < extended_length; ++i)
 			temp[i] = buf[symbol_position + i] * osc();
 		if (status == STATUS_SYNC) {
-			update_oscilloscope(constellation_pixels);
+			update_oscilloscope(constellation_pixels, color_tint);
 			fwd(freq, temp);
 			for (int i = 0; i < carrier_count; ++i)
 				prev[i] = freq[bin(i + carrier_offset)];
@@ -459,7 +465,7 @@ public:
 				cons[i] = demod_or_erase(freq[bin(i + carrier_offset)], prev[i]);
 			compensate();
 			demap();
-			update_constellation(constellation_pixels);
+			update_constellation(constellation_pixels, color_tint);
 			if (++symbol_number == symbol_count)
 				status = STATUS_DONE;
 			for (int i = 0; i < carrier_count; ++i)
@@ -467,14 +473,14 @@ public:
 			for (int i = 0; i < symbol_length; ++i)
 				freq[i] /= symbol_length;
 		} else {
-			update_oscilloscope(constellation_pixels);
+			update_oscilloscope(constellation_pixels, color_tint);
 			for (int i = 0; i < symbol_length; ++i)
 				temp[i] *= window[i];
 			fwd(freq, temp);
 		}
 		for (int i = 0; i < spectrum_width; ++i)
 			power[i] = std::clamp<float>((DSP::decibel(norm(freq[bin(i - spectrum_width / 2)])) - dB_min) / (dB_max - dB_min), 0, 1);
-		update_spectrum(spectrum_pixels);
+		update_spectrum(spectrum_pixels, color_tint);
 		update_spectrogram(spectrogram_pixels);
 		return status;
 	}
