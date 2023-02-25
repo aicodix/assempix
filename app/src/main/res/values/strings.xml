@@ -24,6 +24,7 @@
 	<string name="disable">Disable</string>
 	<string name="force_quit">Force Quit</string>
 	<string name="quit">Quit</string>
+	<string name="close">Close</string>
 	<string name="okay">Okay</string>
 	<string name="audio_init_failed">Audio initialization failed.\nTry other settings.\nForce Quit and restart might also help.</string>
 	<string name="audio_setup_failed">Audio setup failed.\nTry other settings.</string>

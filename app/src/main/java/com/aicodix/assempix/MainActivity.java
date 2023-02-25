@@ -7,6 +7,7 @@ Copyright 2021 Ahmet Inan <inan@aicodix.de>
 package com.aicodix.assempix;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.ShareActionProvider;
@@ -15,7 +16,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuItemCompat;
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -653,7 +653,8 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	private void showTextPage(String title, String message) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.Theme_AlertDialog);
+		builder.setNeutralButton(R.string.close, null);
 		builder.setTitle(title);
 		builder.setMessage(message);
 		builder.show();
