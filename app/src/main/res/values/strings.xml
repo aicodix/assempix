@@ -41,8 +41,15 @@
 	<string name="preamble_sync">Synchronized and receiving</string>
 	<string name="preamble_fail">Preamble failure</string>
 	<string name="preamble_nope">Ignoring preamble</string>
+	<string name="received_ping">Received Ping</string>
 	<string name="mode_unsupported">%1$d (unsupported)</string>
 	<string-array name="operation_modes">
+		<item>0 (simple ping)</item>
+		<item>1 (unsupported)</item>
+		<item>2 (unsupported)</item>
+		<item>3 (unsupported)</item>
+		<item>4 (unsupported)</item>
+		<item>5 (unsupported)</item>
 		<item>6 (8PSK, 2700 Hz, 10 s)</item>
 		<item>7 (8PSK, 2500 Hz, 11 s)</item>
 		<item>8 (QPSK, 2500 Hz, 16 s)</item>

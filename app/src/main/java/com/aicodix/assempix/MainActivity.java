@@ -128,7 +128,8 @@ public class MainActivity extends AppCompatActivity {
 					byte[] call = new byte[9];
 					cachedDecoder(cfo, mode, call);
 					String trim = new String(call).trim();
-					binding.message.setText(getString(R.string.status_message, cfo[0], modeString(mode[0]), trim, getString(R.string.preamble_nope)));
+					String info = getString(mode[0] == 0 ? R.string.received_ping : R.string.preamble_nope);
+					binding.message.setText(getString(R.string.status_message, cfo[0], modeString(mode[0]), trim, info));
 					break;
 				case STATUS_HEAP:
 					binding.message.setText(getString(R.string.heap_error));
@@ -150,8 +151,8 @@ public class MainActivity extends AppCompatActivity {
 	};
 
 	private String modeString(int mode) {
-		if (mode >= 6 && mode <= 13)
-			return getResources().getStringArray(R.array.operation_modes)[mode - 6];
+		if (mode >= 0 && mode <= 13)
+			return getResources().getStringArray(R.array.operation_modes)[mode];
 		return getString(R.string.mode_unsupported, mode);
 	}
 
