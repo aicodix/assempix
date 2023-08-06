@@ -6,15 +6,6 @@ Copyright 2021 Ahmet Inan <inan@aicodix.de>
 
 package com.aicodix.assempix;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.appcompat.widget.ShareActionProvider;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.view.MenuItemCompat;
-
 import android.Manifest;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -40,6 +31,15 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.ShareActionProvider;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.MenuItemCompat;
 
 import com.aicodix.assempix.databinding.ActivityMainBinding;
 
@@ -201,9 +201,17 @@ public class MainActivity extends AppCompatActivity {
 		values.put(MediaStore.Images.ImageColumns.MIME_TYPE, mime);
 		ContentResolver resolver = getContentResolver();
 		Uri uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+		if (uri == null) {
+			statusMessage(R.string.storing_picture_failed);
+			return;
+		}
 		if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
 			try {
 				ParcelFileDescriptor descriptor = getContentResolver().openFileDescriptor(uri, "w");
+				if (descriptor == null) {
+					statusMessage(R.string.storing_picture_failed);
+					return;
+				}
 				FileOutputStream stream = new FileOutputStream(descriptor.getFileDescriptor());
 				stream.write(payload);
 				stream.close();
