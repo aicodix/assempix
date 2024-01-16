@@ -62,6 +62,10 @@
 	<string name="heap_error">Not enough memory</string>
 	<string name="decoding_failed">Decoding failed</string>
 	<string name="payload_unknown">Payload unknown</string>
+	<string name="chunk_unsupported">Unsupported chunk format</string>
+	<string name="chunk_duplicate">Duplicate chunk received</string>
+	<string name="chunk_redundant">Redundant chunk received</string>
+	<string name="chunk_received">Chunk %1$d of %2$d received</string>
 	<string name="image_received">Image received with %1$d bit flips</string>
 	<string name="creating_picture_directory_failed">Creating picture directory failed.\nCheck permissions.</string>
 	<string name="creating_picture_file_failed">Creating picture file failed.\nCheck permissions.</string>

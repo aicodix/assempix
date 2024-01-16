@@ -49,6 +49,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 
@@ -67,6 +68,9 @@ public class MainActivity extends AppCompatActivity {
 	private int audioSource;
 	private int bitFlips;
 	private int colorTint;
+	private int currentBlockCount;
+	private int currentImageBytes;
+	private long currentImageCRC32;
 	private short[] audioBuffer;
 	private ActivityMainBinding binding;
 	private Menu menu;
@@ -81,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
 	private byte[] callSign;
 	private byte[] payload;
 	private String callTrim;
+	private HashSet<Integer> identList;
 
 	private native int processDecoder(int[] spectrumPixels, int[] spectrogramPixels, int[] constellationPixels, int[] peakMeterPixels, short[] audioBuffer, int channelSelect, int colorTint);
 
@@ -160,6 +165,8 @@ public class MainActivity extends AppCompatActivity {
 		String statMsg;
 		if (status == R.string.image_received)
 			statMsg = getString(status, bitFlips);
+		else if (status == R.string.chunk_received)
+			statMsg = getString(status, identList.size(), currentBlockCount);
 		else
 			statMsg = getString(status);
 		if (callTrim != null)
@@ -168,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
 			binding.message.setText(getString(status));
 	}
 
-	private void storePayload(String mime, String suffix, Date date) {
+	private void storeImage(byte[] data, String mime, String suffix, Date date) {
 		String name = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(date);
 		String title = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(date);
 		name += "_" + callTrim.replace(' ', '_') + suffix;
@@ -185,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
 			try {
 				file = new File(dir, name);
 				FileOutputStream stream = new FileOutputStream(file);
-				stream.write(payload);
+				stream.write(data);
 				stream.close();
 			} catch (IOException e) {
 				statusMessage(R.string.creating_picture_file_failed);
@@ -213,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
 					return;
 				}
 				FileOutputStream stream = new FileOutputStream(descriptor.getFileDescriptor());
-				stream.write(payload);
+				stream.write(data);
 				stream.close();
 				descriptor.close();
 			} catch (IOException e) {
@@ -234,9 +241,44 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	private void decodePayload() {
+		byte[] data = payload;
+		if (payload[0] == 'C' && payload[1] == 'R' && payload[2] == 'S') {
+			int overhead = 14;
+			int chunksMax = 12;
+			int availBytes = 5380;
+			int bytesMax = (availBytes - overhead) * chunksMax;
+			int blockCount = (payload[4] << 8) + payload[3] + 1;
+			int blockIdent = (payload[6] << 8) + payload[5];
+			int imageBytes = (payload[9] << 16) + (payload[8] << 8) + payload[7] + 1;
+			long imageCRC32 = (payload[13] << 24) + (payload[12] << 16) + (payload[11] << 8) + payload[10];
+			if (blockCount > chunksMax || blockIdent < blockCount || imageBytes > bytesMax) {
+				statusMessage(R.string.chunk_unsupported);
+				return;
+			}
+			if (currentBlockCount != blockCount || currentImageBytes != imageBytes || currentImageCRC32 != imageCRC32) {
+				identList = new HashSet<>();
+				currentBlockCount = blockCount;
+				currentImageBytes = imageBytes;
+				currentImageCRC32 = imageCRC32;
+			}
+			if (identList.contains(blockIdent)) {
+				statusMessage(R.string.chunk_duplicate);
+				return;
+			}
+			if (identList.size() == blockCount) {
+				statusMessage(R.string.chunk_redundant);
+				return;
+			}
+			identList.add(blockIdent);
+			statusMessage(R.string.chunk_received);
+			if (identList.size() == blockCount) {
+				return;
+			}
+			return;
+		}
 		BitmapFactory.Options opt = new BitmapFactory.Options();
 		opt.inJustDecodeBounds = true;
-		BitmapFactory.decodeByteArray(payload, 0, payload.length, opt);
+		BitmapFactory.decodeByteArray(data, 0, data.length, opt);
 		if (opt.outMimeType == null) {
 			statusMessage(R.string.payload_unknown);
 			return;
@@ -264,7 +306,7 @@ public class MainActivity extends AppCompatActivity {
 			statusMessage(R.string.payload_unknown);
 			return;
 		}
-		Bitmap bitmap = BitmapFactory.decodeByteArray(payload, 0, payload.length);
+		Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
 		if (bitmap == null) {
 			statusMessage(R.string.decoding_failed);
 			return;
@@ -274,7 +316,7 @@ public class MainActivity extends AppCompatActivity {
 		Date date = new Date();
 		String hour = new SimpleDateFormat("HH:mm:ss", Locale.US).format(date);
 		setTitle(hour + " - " + callTrim + " - " + type);
-		storePayload(opt.outMimeType, suffix, date);
+		storeImage(data, opt.outMimeType, suffix, date);
 	}
 
 	private String getAudioSourceString(int audioSource) {
