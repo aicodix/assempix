@@ -93,6 +93,10 @@ public class MainActivity extends AppCompatActivity {
 
 	private native int fetchDecoder(byte[] payload);
 
+	private native void chunkDecoder(byte[] payload, int blockIndex, int blockIdent);
+
+	private native long recoverDecoder(byte[] payload, int blockCount);
+
 	private native boolean createDecoder(int sampleRate);
 
 	private native void destroyDecoder();
@@ -247,10 +251,10 @@ public class MainActivity extends AppCompatActivity {
 			int chunksMax = 12;
 			int availBytes = 5380;
 			int bytesMax = (availBytes - overhead) * chunksMax;
-			int blockCount = (payload[4] << 8) + payload[3] + 1;
-			int blockIdent = (payload[6] << 8) + payload[5];
-			int imageBytes = (payload[9] << 16) + (payload[8] << 8) + payload[7] + 1;
-			long imageCRC32 = (payload[13] << 24) + (payload[12] << 16) + (payload[11] << 8) + payload[10];
+			int blockCount = ((payload[4] & 255) << 8) + (payload[3] & 255) + 1;
+			int blockIdent = ((payload[6] & 255) << 8) + (payload[5] & 255);
+			int imageBytes = ((payload[9] & 255) << 16) + ((payload[8] & 255) << 8) + (payload[7] & 255) + 1;
+			long imageCRC32 = ((payload[13] & 255L) << 24) + ((payload[12] & 255L) << 16) + ((payload[11] & 255L) << 8) + (payload[10] & 255L);
 			if (blockCount > chunksMax || blockIdent < blockCount || imageBytes > bytesMax) {
 				statusMessage(R.string.chunk_unsupported);
 				return;
@@ -269,12 +273,20 @@ public class MainActivity extends AppCompatActivity {
 				statusMessage(R.string.chunk_redundant);
 				return;
 			}
+			chunkDecoder(payload, identList.size(), blockIdent);
 			identList.add(blockIdent);
 			statusMessage(R.string.chunk_received);
-			if (identList.size() == blockCount) {
+			if (identList.size() < blockCount) {
 				return;
 			}
-			return;
+			data = new byte[currentImageBytes];
+			if (currentImageCRC32 != recoverDecoder(data, identList.size())) {
+				statusMessage(R.string.chunk_corrupted);
+				currentBlockCount = 0;
+				currentImageBytes = 0;
+				currentImageCRC32 = 0;
+				return;
+			}
 		}
 		BitmapFactory.Options opt = new BitmapFactory.Options();
 		opt.inJustDecodeBounds = true;
