@@ -87,15 +87,17 @@ public class MainActivity extends AppCompatActivity {
 	private String callTrim;
 	private HashSet<Integer> identList;
 
+	private native boolean createCRSEC();
+
+	private native boolean chunkCRSEC(byte[] payload, int blockIndex, int blockIdent);
+
+	private native long recoverCRSEC(byte[] payload, int blockCount);
+
 	private native int processDecoder(int[] spectrumPixels, int[] spectrogramPixels, int[] constellationPixels, int[] peakMeterPixels, short[] audioBuffer, int channelSelect, int colorTint);
 
 	private native void cachedDecoder(float[] carrierFrequencyOffset, int[] operationMode, byte[] callSign);
 
 	private native int fetchDecoder(byte[] payload);
-
-	private native void chunkDecoder(byte[] payload, int blockIndex, int blockIdent);
-
-	private native long recoverDecoder(byte[] payload, int blockCount);
 
 	private native boolean createDecoder(int sampleRate);
 
@@ -273,14 +275,20 @@ public class MainActivity extends AppCompatActivity {
 				statusMessage(R.string.chunk_redundant);
 				return;
 			}
-			chunkDecoder(payload, identList.size(), blockIdent);
+			if (!chunkCRSEC(payload, identList.size(), blockIdent)) {
+				statusMessage(R.string.heap_error);
+				currentBlockCount = 0;
+				currentImageBytes = 0;
+				currentImageCRC32 = 0;
+				return;
+			}
 			identList.add(blockIdent);
 			statusMessage(R.string.chunk_received);
 			if (identList.size() < blockCount) {
 				return;
 			}
 			data = new byte[currentImageBytes];
-			if (currentImageCRC32 != recoverDecoder(data, identList.size())) {
+			if (currentImageCRC32 != recoverCRSEC(data, identList.size())) {
 				statusMessage(R.string.chunk_corrupted);
 				currentBlockCount = 0;
 				currentImageBytes = 0;
@@ -539,6 +547,8 @@ public class MainActivity extends AppCompatActivity {
 		operationMode = new int[1];
 		callSign = new byte[9];
 		payload = new byte[5380];
+		if (!createCRSEC())
+			binding.message.setText(getString(R.string.heap_error));
 
 		List<String> permissions = new ArrayList<>();
 		if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {

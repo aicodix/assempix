@@ -6,9 +6,53 @@ Copyright 2021 Ahmet Inan <inan@aicodix.de>
 
 #include <jni.h>
 #define assert(expr)
+#include "crsec.hh"
 #include "decoder.hh"
 
+static CauchyReedSolomonErasureCoding *crsec;
 static Interface *decoder;
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_aicodix_assempix_MainActivity_createCRSEC(
+	JNIEnv *,
+	jobject) {
+	if (crsec == nullptr)
+		crsec = new(std::nothrow) CauchyReedSolomonErasureCoding();
+	return crsec != nullptr;
+}
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_aicodix_assempix_MainActivity_chunkCRSEC(
+	JNIEnv *env,
+	jobject,
+	jbyteArray JNI_payload,
+	jint JNI_blockIndex,
+	jint JNI_blockIdent) {
+	jboolean status = false;
+	if (decoder) {
+		jbyte *payload = env->GetByteArrayElements(JNI_payload, nullptr);
+		if (payload)
+			status = crsec->chunk(reinterpret_cast<const uint8_t *>(payload), JNI_blockIndex, JNI_blockIdent);
+		env->ReleaseByteArrayElements(JNI_payload, payload,JNI_ABORT);
+	}
+	return status;
+}
+
+extern "C" JNIEXPORT jlong JNICALL
+Java_com_aicodix_assempix_MainActivity_recoverCRSEC(
+	JNIEnv *env,
+	jobject,
+	jbyteArray JNI_payload,
+	jint JNI_blockCount) {
+	jlong status = -1;
+	if (decoder) {
+		jbyte *payload = env->GetByteArrayElements(JNI_payload, nullptr);
+		if (payload)
+			status = crsec->recover(reinterpret_cast<uint8_t *>(payload), env->GetArrayLength(JNI_payload), JNI_blockCount);
+		env->ReleaseByteArrayElements(JNI_payload, payload,0);
+	}
+	return status;
+}
 
 extern "C" JNIEXPORT void JNICALL
 Java_com_aicodix_assempix_MainActivity_destroyDecoder(
@@ -59,37 +103,6 @@ Java_com_aicodix_assempix_MainActivity_fetchDecoder(
 		if (payload)
 			status = decoder->fetch(reinterpret_cast<uint8_t *>(payload));
 		env->ReleaseByteArrayElements(JNI_payload, payload, 0);
-	}
-	return status;
-}
-
-extern "C" JNIEXPORT void JNICALL
-Java_com_aicodix_assempix_MainActivity_chunkDecoder(
-	JNIEnv *env,
-	jobject,
-	jbyteArray JNI_payload,
-	jint JNI_blockIndex,
-	jint JNI_blockIdent) {
-	if (decoder) {
-		jbyte *payload = env->GetByteArrayElements(JNI_payload, nullptr);
-		if (payload)
-			decoder->chunk(reinterpret_cast<const uint8_t *>(payload), JNI_blockIndex, JNI_blockIdent);
-		env->ReleaseByteArrayElements(JNI_payload, payload,JNI_ABORT);
-	}
-}
-
-extern "C" JNIEXPORT jlong JNICALL
-Java_com_aicodix_assempix_MainActivity_recoverDecoder(
-	JNIEnv *env,
-	jobject,
-	jbyteArray JNI_payload,
-	jint JNI_blockCount) {
-	jlong status = -1;
-	if (decoder) {
-		jbyte *payload = env->GetByteArrayElements(JNI_payload, nullptr);
-		if (payload)
-			status = decoder->recover(reinterpret_cast<uint8_t *>(payload), env->GetArrayLength(JNI_payload), JNI_blockCount);
-		env->ReleaseByteArrayElements(JNI_payload, payload,0);
 	}
 	return status;
 }

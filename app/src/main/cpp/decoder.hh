@@ -12,8 +12,6 @@ Copyright 2021 Ahmet Inan <inan@aicodix.de>
 
 namespace DSP { using std::abs; using std::min; using std::cos; using std::sin; }
 
-#include "cauchy_reed_solomon_erasure_coding.hh"
-#include "galois_field.hh"
 #include "schmidl_cox.hh"
 #include "bip_buffer.hh"
 #include "theil_sen.hh"
@@ -50,10 +48,6 @@ struct Interface {
 
 	virtual int fetch(uint8_t *) = 0;
 
-	virtual void chunk(const uint8_t *, int, int) = 0;
-
-	virtual long recover(uint8_t *, int, int) = 0;
-
 	virtual int rate() = 0;
 
 	virtual ~Interface() = default;
@@ -64,12 +58,6 @@ class Decoder : public Interface {
 	typedef DSP::Complex<float> cmplx;
 	typedef DSP::Const<float> Const;
 	typedef float code_type;
-	typedef CODE::GaloisField<16, 0b10001000000001011, uint16_t> GaloisField;
-#ifdef __AVX2__
-	static const int SIMD = 32;
-#else
-	static const int SIMD = 16;
-#endif
 	static const int spectrum_width = 640, spectrum_height = 64;
 	static const int spectrogram_width = 640, spectrogram_height = 64;
 	static const int constellation_width = 64, constellation_height = 64;
@@ -100,20 +88,15 @@ class Decoder : public Interface {
 	DSP::Hann<float> hann;
 	DSP::LowPass2<float> lowpass;
 	DSP::Coeffs<symbol_length, float, true> window;
-	GaloisField instance;
 	CODE::CRC<uint16_t> crc;
-	CODE::CRC<uint32_t> crc32;
-	CODE::CauchyReedSolomonErasureCoding<GaloisField> crs;
 	CODE::OrderedStatisticsDecoder<255, 71, 2> osd;
 	Polar<code_type> polar;
-	alignas(SIMD) uint8_t chunk_mesg[5376], chunk_data[64512];
 	cmplx temp[extended_length], freq[symbol_length], prev[carrier_count_max], cons[carrier_count_max];
 	float power[spectrum_width]{}, index[carrier_count_max]{}, phase[carrier_count_max]{};
 	code_type code[65536];
 	int8_t generator[255 * 71];
 	int8_t soft[pre_seq_len];
 	uint8_t data[(pre_seq_len + 7) / 8];
-	uint16_t chunk_ident[12];
 	int prev_peak = 0;
 	int carrier_count = 0;
 	int symbol_count = 0;
@@ -421,7 +404,7 @@ class Decoder : public Interface {
 	}
 
 public:
-	Decoder() : correlator(corSeq()), crc(0xA8F4), crc32(0x8F6E37A0), lowpass(1, symbol_length), window(&hann, &lowpass) {
+	Decoder() : correlator(corSeq()), crc(0xA8F4), lowpass(1, symbol_length), window(&hann, &lowpass) {
 		CODE::BoseChaudhuriHocquenghemGenerator<255, 71>::matrix(generator, true, {
 			0b100011101, 0b101110111, 0b111110011, 0b101101001,
 			0b110111101, 0b111100111, 0b100101011, 0b111010111,
@@ -449,27 +432,6 @@ public:
 		for (int i = 0; i < data_bits / 8; ++i)
 			payload[i] ^= scrambler();
 		return result;
-	}
-
-	void chunk(const uint8_t *payload, int idx, int ident) final {
-		chunk_ident[idx] = ident;
-		std::memcpy(chunk_data + idx * 5376, payload + 14, 5366);
-	}
-
-	long recover(uint8_t *payload, int size, int count) final {
-		int copy = (size + count - 1) / count;
-		crc32.reset();
-		for (int i = 0, j = 0; i < count; ++i) {
-			crs.decode(chunk_mesg, chunk_data, chunk_ident, i, 5376, count);
-			j += copy;
-			if (j > size)
-				copy -= j - size;
-			std::memcpy(payload, chunk_mesg, copy);
-			for (int k = 0; k < copy; ++k)
-				crc32(chunk_mesg[k]);
-			payload += copy;
-		}
-		return crc32();
 	}
 
 	int process(uint32_t *spectrum_pixels, uint32_t *spectrogram_pixels, uint32_t *constellation_pixels, uint32_t *peak_meter_pixels, const int16_t *audio_buffer, int channel_select, int color_tint) final {
