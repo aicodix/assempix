@@ -29,3 +29,12 @@ remove:
 start:
 	$(ADB) shell am start -n $(PACKAGE)/$(PACKAGE).MainActivity
 
+.PHONY: stop
+
+stop:
+	$(ADB) shell am force-stop $(PACKAGE)
+
+.PHONY: restart
+
+restart: stop start
+
