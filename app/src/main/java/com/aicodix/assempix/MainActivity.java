@@ -23,7 +23,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.ParcelFileDescriptor;
+import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.view.Gravity;
 import android.view.Menu;
@@ -71,9 +73,11 @@ public class MainActivity extends AppCompatActivity {
 	private int currentBlockCount;
 	private int currentImageBytes;
 	private long currentImageCRC32;
+	private long messageMillis;
 	private short[] audioBuffer;
 	private ActivityMainBinding binding;
 	private Menu menu;
+	private Handler handler;
 	private final int spectrumWidth = 640, spectrumHeight = 64;
 	private final int spectrogramWidth = 640, spectrogramHeight = 64;
 	private final int constellationWidth = 64, constellationHeight = 64;
@@ -140,10 +144,10 @@ public class MainActivity extends AppCompatActivity {
 					cachedDecoder(cfo, mode, call);
 					String trim = new String(call).trim();
 					String info = getString(mode[0] == 0 ? R.string.received_ping : R.string.preamble_nope);
-					binding.message.setText(getString(R.string.status_message, cfo[0], modeString(mode[0]), trim, info));
+					stringMessage(getString(R.string.status_message, cfo[0], modeString(mode[0]), trim, info));
 					break;
 				case STATUS_HEAP:
-					binding.message.setText(getString(R.string.heap_error));
+					stringMessage(getString(R.string.heap_error));
 					break;
 				case STATUS_SYNC:
 					cachedDecoder(carrierFrequencyOffset, operationMode, callSign);
@@ -167,6 +171,20 @@ public class MainActivity extends AppCompatActivity {
 		return getString(R.string.mode_unsupported, mode);
 	}
 
+	private void stringMessage(String text) {
+		long currentMillis = SystemClock.elapsedRealtime();
+		long difference = currentMillis - messageMillis;
+		long interval = 3000;
+		if (difference < interval) {
+			messageMillis += interval;
+			long delayMillis = messageMillis - currentMillis;
+			handler.postDelayed(() -> binding.message.setText(text), delayMillis);
+		} else {
+			messageMillis = currentMillis;
+			binding.message.setText(text);
+		}
+	}
+
 	private void statusMessage(int status) {
 		String statMsg;
 		if (status == R.string.image_received)
@@ -176,9 +194,9 @@ public class MainActivity extends AppCompatActivity {
 		else
 			statMsg = getString(status);
 		if (callTrim != null)
-			binding.message.setText(getString(R.string.status_message, carrierFrequencyOffset[0], modeString(operationMode[0]), callTrim, statMsg));
+			stringMessage(getString(R.string.status_message, carrierFrequencyOffset[0], modeString(operationMode[0]), callTrim, statMsg));
 		else
-			binding.message.setText(getString(status));
+			stringMessage(getString(status));
 	}
 
 	private void storeImage(byte[] data, String mime, String suffix, Date date) {
@@ -376,9 +394,9 @@ public class MainActivity extends AppCompatActivity {
 			audioRecord.startRecording();
 			if (audioRecord.getRecordingState() == AudioRecord.RECORDSTATE_RECORDING) {
 				audioRecord.read(audioBuffer, 0, audioBuffer.length);
-				binding.message.setText(getString(R.string.audio_recording_config, sampleRate, getChannelSelectString(channelSelect), getAudioSourceString(audioSource)));
+				stringMessage(getString(R.string.audio_recording_config, sampleRate, getChannelSelectString(channelSelect), getAudioSourceString(audioSource)));
 			} else {
-				binding.message.setText(getString(R.string.audio_recording_error));
+				stringMessage(getString(R.string.audio_recording_error));
 			}
 		}
 	}
@@ -386,7 +404,7 @@ public class MainActivity extends AppCompatActivity {
 	private void stopListening() {
 		if (audioRecord != null) {
 			audioRecord.stop();
-			binding.message.setText(getString(R.string.audio_recording_paused));
+			stringMessage(getString(R.string.audio_recording_paused));
 		}
 	}
 
@@ -426,16 +444,16 @@ public class MainActivity extends AppCompatActivity {
 						startListening();
 				} else {
 					testAudioRecord.release();
-					binding.message.setText(getString(R.string.heap_error));
+					stringMessage(getString(R.string.heap_error));
 				}
 			} else {
 				testAudioRecord.release();
-				binding.message.setText(getString(R.string.audio_init_failed));
+				stringMessage(getString(R.string.audio_init_failed));
 			}
 		} catch (IllegalArgumentException e) {
-			binding.message.setText(getString(R.string.audio_setup_failed));
+			stringMessage(getString(R.string.audio_setup_failed));
 		} catch (SecurityException e) {
-			binding.message.setText(getString(R.string.audio_permission_denied));
+			stringMessage(getString(R.string.audio_permission_denied));
 		}
 	}
 
@@ -523,6 +541,7 @@ public class MainActivity extends AppCompatActivity {
 			audioSource = state.getInt("audioSource", defaultAudioSource);
 		}
 		super.onCreate(state);
+		handler = new Handler(getMainLooper());
 		binding = ActivityMainBinding.inflate(getLayoutInflater());
 		changeLayoutOrientation(getResources().getConfiguration());
 		setContentView(binding.getRoot());
@@ -548,12 +567,12 @@ public class MainActivity extends AppCompatActivity {
 		callSign = new byte[9];
 		payload = new byte[5380];
 		if (!createCRSEC())
-			binding.message.setText(getString(R.string.heap_error));
+			stringMessage(getString(R.string.heap_error));
 
 		List<String> permissions = new ArrayList<>();
 		if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
 			permissions.add(Manifest.permission.RECORD_AUDIO);
-			binding.message.setText(getString(R.string.audio_permission_denied));
+			stringMessage(getString(R.string.audio_permission_denied));
 		} else {
 			initAudioRecord(false);
 		}
