@@ -34,6 +34,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -41,7 +42,10 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.ShareActionProvider;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
 import androidx.core.view.MenuItemCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.aicodix.assempix.databinding.ActivityMainBinding;
 
@@ -502,6 +506,15 @@ public class MainActivity extends AppCompatActivity {
 			binding.content.setOrientation(LinearLayout.HORIZONTAL);
 		else
 			binding.content.setOrientation(LinearLayout.VERTICAL);
+		handleInsets();
+	}
+
+	private void handleInsets() {
+		ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+			Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+			v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+			return insets;
+		});
 	}
 
 	@Override
@@ -541,10 +554,11 @@ public class MainActivity extends AppCompatActivity {
 			audioSource = state.getInt("audioSource", defaultAudioSource);
 		}
 		super.onCreate(state);
+		EdgeToEdge.enable(this);
 		handler = new Handler(getMainLooper());
 		binding = ActivityMainBinding.inflate(getLayoutInflater());
-		changeLayoutOrientation(getResources().getConfiguration());
 		setContentView(binding.getRoot());
+		changeLayoutOrientation(getResources().getConfiguration());
 		colorTint = ContextCompat.getColor(this, R.color.tint);
 		spectrumBitmap = Bitmap.createBitmap(spectrumWidth, spectrumHeight, Bitmap.Config.ARGB_8888);
 		spectrogramBitmap = Bitmap.createBitmap(spectrogramWidth, spectrogramHeight, Bitmap.Config.ARGB_8888);
