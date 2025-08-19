@@ -22,6 +22,7 @@ Following image formats are supported:
 * [JPEG](https://en.wikipedia.org/wiki/JPEG)
 * [PNG](https://en.wikipedia.org/wiki/Portable_Network_Graphics)
 * [WebP](https://en.wikipedia.org/wiki/WebP)
+* [AVIF](https://en.wikipedia.org/wiki/AVIF)
 
 Width and height are limited to between ```16``` and ```1024```.
 
