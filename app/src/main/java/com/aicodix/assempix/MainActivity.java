@@ -340,6 +340,12 @@ public class MainActivity extends AppCompatActivity {
 				suffix = ".webp";
 				type = "WebP";
 				break;
+			case "image/avif":
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+					suffix = ".avif";
+					type = "AVIF";
+					break;
+				}
 			default:
 				statusMessage(R.string.payload_unknown);
 				return;
