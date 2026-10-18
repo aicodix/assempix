@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Assempix</string>
+    <string name="action_share">分享</string>
+    <string name="sample_rate">采样率</string>
+    <string name="rate_8000">8000 Hz</string>
+    <string name="rate_16000">16000 Hz</string>
+    <string name="rate_32000">32000 Hz</string>
+    <string name="rate_44100">44100 Hz</string>
+    <string name="rate_48000">48000 Hz</string>
+    <string name="channel_select">声道选择</string>
+    <string name="channel_default">默认</string>
+    <string name="channel_first">第一声道</string>
+    <string name="channel_second">第二声道</string>
+    <string name="channel_summation">声道求和</string>
+    <string name="channel_analytic">解析信号</string>
+    <string name="audio_source">音频源</string>
+    <string name="source_default">默认</string>
+    <string name="source_microphone">麦克风</string>
+    <string name="source_camcorder">摄像机</string>
+    <string name="source_voice_recognition">语音识别</string>
+    <string name="source_unprocessed">未处理音频</string>
+    <string name="night_mode">夜间模式</string>
+    <string name="enable">启用</string>
+    <string name="disable">停用</string>
+    <string name="force_quit">强制退出</string>
+    <string name="quit">退出</string>
+    <string name="close">关闭</string>
+    <string name="okay">确定</string>
+    <string name="audio_init_failed">音频初始化失败。\n请尝试其他设置。\n强制退出并重新启动应用也可能有帮助。</string>
+    <string name="audio_setup_failed">音频设置失败。\n请尝试其他设置。</string>
+    <string name="audio_permission_denied">麦克风访问被拒绝。\n请检查应用权限。</string>
+    <string name="audio_recording_paused">录音已暂停</string>
+    <string name="audio_recording_error">音频录制失败。\n请检查访问是否受到限制。\n如有必要，请重启设备以恢复音频访问。</string>
+    <string name="audio_recording_config">采样率：%1$d Hz\n声道选择：%2$s\n音频源：%3$s</string>
+    <string name="image_description">已解码的图像</string>
+    <string name="spectrum_description">音频信号频谱</string>
+    <string name="spectrogram_description">音频信号频谱图</string>
+    <string name="constellation_description">解调后的星座图</string>
+    <string name="peak_meter_description">音频信号峰值电平</string>
+    <string name="status_message">载波：%1$.2f Hz\n模式：%2$s\n呼号：%3$s\n\n%4$s</string>
+    <string name="preamble_sync">已同步，正在接收</string>
+    <string name="preamble_fail">前导码校验失败</string>
+    <string name="preamble_nope">忽略前导码</string>
+    <string name="received_ping">已收到 Ping</string>
+    <string name="mode_unsupported">%1$d（不支持）</string>
+    <string-array name="operation_modes">
+        <item>0（简单 Ping）</item>
+        <item>1（不支持）</item>
+        <item>2（不支持）</item>
+        <item>3（不支持）</item>
+        <item>4（不支持）</item>
+        <item>5（不支持）</item>
+        <item>6（8PSK，2700 Hz，10 秒）</item>
+        <item>7（8PSK，2500 Hz，11 秒）</item>
+        <item>8（QPSK，2500 Hz，16 秒）</item>
+        <item>9（QPSK，2250 Hz，18 秒）</item>
+        <item>10（8PSK，3200 Hz，9 秒）</item>
+        <item>11（8PSK，2400 Hz，11 秒）</item>
+        <item>12（QPSK，2400 Hz，16 秒）</item>
+        <item>13（QPSK，1600 Hz，24 秒）</item>
+    </string-array>
+    <string name="heap_error">内存不足</string>
+    <string name="decoding_failed">解码失败</string>
+    <string name="payload_unknown">未知的数据载荷</string>
+    <string name="chunk_unsupported">不支持的分块格式</string>
+    <string name="chunk_duplicate">收到重复的数据分块</string>
+    <string name="chunk_redundant">收到冗余的数据分块</string>
+    <string name="chunk_corrupted">图像分块已损坏</string>
+    <string name="chunk_received">已接收第 %1$d/%2$d 个分块</string>
+    <string name="image_received">图像已接收，发生 %1$d 位翻转</string>
+    <string name="creating_picture_directory_failed">创建图片目录失败。\n请检查应用权限。</string>
+    <string name="creating_picture_file_failed">创建图片文件失败。\n请检查应用权限。</string>
+    <string name="storing_picture_failed">保存图片失败</string>
+    <string name="privacy_policy">隐私政策</string>
+    <string name="privacy_policy_text">为了将 COFDMTV 编码的音频信号解码为图像，Assempix 需要访问麦克风。
+麦克风属于敏感权限，你有权了解 Assempix 如何使用麦克风访问权限：
+麦克风录制的数据仅用于 COFDMTV 解码器、VU 电平表，以及用于显示频率内容的频谱分析器。
+Assempix 只使用一小段临时内存缓冲区，并持续用新的音频数据覆盖其中的旧数据。
+只有 COFDMTV 解码器生成的图像会被保存到设备的持久存储中。</string>
+    <string name="about">关于 Assempix</string>
+    <string name="about_text">Assempix %1$s\n版权所有 2021 aicodix GmbH
+\n\n请阅读本页面底部的免责声明。
+\n\nAssempix 用于将 COFDMTV 编码的音频信号解码为图像，基于以下开源软件：
+\n\nOFDM 调制解调器解码器及规范：
+\nhttps://github.com/aicodix/modem
+\nBSD Zero Clause 许可证
+\n\n极化码列表与有序统计解码：
+\nhttps://github.com/aicodix/code
+\nBSD Zero Clause 许可证
+\n\n数字信号处理：
+\nhttps://github.com/aicodix/dsp
+\nBSD Zero Clause 许可证
+\n\n应用启动图标：
+\nhttps://github.com/google/material-design-icons
+\nApache 许可证 2.0
+\n\n免责声明：
+\n本软件按“原样”提供，作者不对本软件作出任何明示或暗示的保证，包括但不限于适销性和适用性的保证。在任何情况下，作者均不对因使用本软件、无法使用本软件、数据或利润损失，或因合同、侵权（包括过失）或其他原因而产生的任何特殊、直接、间接或后果性损害承担责任，无论该等损害是否与本软件的使用或性能有关。</string>
+</resources>
