@@ -38,7 +38,9 @@ jobs:
 
       - name: Install Android build dependencies
         run: |
-          sdkmanager "platforms;android-37" "build-tools;37.0.0" "cmake;3.22.1" "ndk;28.2.13676358"
+          # Android API 37 is published as android-37.0 on the Canary channel.
+          sdkmanager --channel=3 "platforms;android-37.0"
+          sdkmanager "build-tools;37.0.0" "cmake;3.22.1" "ndk;28.2.13676358"
 
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
