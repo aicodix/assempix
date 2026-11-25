@@ -1,12 +1,12 @@
 <resources>
-	<string name="app_name">Assempix</string>
+	<string name="app_name" translatable="false">Assempix</string>
 	<string name="action_share">Share</string>
 	<string name="sample_rate">Sample Rate</string>
-	<string name="rate_8000">8000 Hz</string>
-	<string name="rate_16000">16000 Hz</string>
-	<string name="rate_32000">32000 Hz</string>
-	<string name="rate_44100">44100 Hz</string>
-	<string name="rate_48000">48000 Hz</string>
+	<string name="rate_8000" translatable="false">8000 Hz</string>
+	<string name="rate_16000" translatable="false">16000 Hz</string>
+	<string name="rate_32000" translatable="false">32000 Hz</string>
+	<string name="rate_44100" translatable="false">44100 Hz</string>
+	<string name="rate_48000" translatable="false">48000 Hz</string>
 	<string name="channel_select">Channel Select</string>
 	<string name="channel_default">Default</string>
 	<string name="channel_first">First</string>
@@ -78,7 +78,7 @@ The data recorded from the microphone is only used to feed the COFDMTV decoder, 
 Assempix uses a very small temporary buffer in volatile memory and constantly overwrites that buffer with new data from the microphone.
 The resulting images from the COFDMTV decoder is the only data that gets stored in persistent storage on your device.</string>
 	<string name="about">About Assempix</string>
-	<string name="about_text">Assempix %1$s\nCopyright 2021 aicodix GmbH
+	<string name="about_text" translatable="false">Assempix %1$s\nCopyright 2021 aicodix GmbH
 \n\nPlease read the disclaimer at the bottom of this page.
 \n\nAssempix decodes COFDMTV encoded audio signals to images and is based on open-source software:
 \n\nOFDM modem decoder and specification:\nhttps://github.com/aicodix/modem\nBSD Zero Clause License

@@ -1,0 +1,75 @@
+<resources>
+	<string name="action_share">Udostępnij</string>
+	<string name="sample_rate">Częstotliwość próbkowania</string>
+	<string name="channel_select">Wybór kanału</string>
+	<string name="channel_default">Domyślny</string>
+	<string name="channel_first">Pierwszy</string>
+	<string name="channel_second">Drugi</string>
+	<string name="channel_summation">Sumowanie</string>
+	<string name="channel_analytic">Analiza</string>
+	<string name="audio_source">Źródło dźwięku</string>
+	<string name="source_default">Domyślne</string>
+	<string name="source_microphone">Mikrofon</string>
+	<string name="source_camcorder">Kamera</string>
+	<string name="source_voice_recognition">Rozpoznawanie mowy</string>
+	<string name="source_unprocessed">Nieprzetworzone</string>
+	<string name="night_mode">Tryb nocny</string>
+	<string name="enable">Włącz</string>
+	<string name="disable">Wyłącz</string>
+	<string name="force_quit">Wymuś zamknięcie</string>
+	<string name="quit">Wyjdź</string>
+	<string name="close">Zamknij</string>
+	<string name="okay">OK</string>
+	<string name="audio_init_failed">Inicjalizacja dźwięku nie powiodła się.\nSpróbuj innych ustawień.\nWymuszenie zamknięcia i ponowne uruchomienie również mogą pomóc.</string>
+	<string name="audio_setup_failed">Konfiguracja dźwięku nie powiodła się.\nSpróbuj innych ustawień.</string>
+	<string name="audio_permission_denied">Brak dostępu do mikrofonu.\nSprawdź uprawnienia.</string>
+	<string name="audio_recording_paused">Nagrywanie wstrzymane</string>
+	<string name="audio_recording_error">Nagrywanie dźwięku nie powiodło się.\nSprawdź, czy dostęp nie jest zablokowany.\nW razie potrzeby uruchom urządzenie ponownie, aby odzyskać dostęp.</string>
+	<string name="audio_recording_config">Próbkowanie: %1$d Hz\nWybrany kanał: %2$s\nŹródło dźwięku: %3$s</string>
+	<string name="image_description">Zdekodowany obraz</string>
+	<string name="spectrum_description">Widmo sygnału dźwiękowego</string>
+	<string name="spectrogram_description">Spektrogram sygnału dźwiękowego</string>
+	<string name="constellation_description">Zdemodulowane punkty konstelacji</string>
+	<string name="peak_meter_description">Szczytowy poziom sygnału dźwiękowego</string>
+	<string name="status_message">Nośna: %1$.2f Hz\nTryb: %2$s\nZnak: %3$s\n\n%4$s</string>
+	<string name="preamble_sync">Zsynchronizowano i odbieram</string>
+	<string name="preamble_fail">Błąd preambuły</string>
+	<string name="preamble_nope">Ignorowanie preambuły</string>
+	<string name="received_ping">Odebrano Ping</string>
+	<string name="mode_unsupported">%1$d (nieobsługiwany)</string>
+	<string-array name="operation_modes">
+		<item>0 (prosty ping)</item>
+		<item>1 (nieobsługiwany)</item>
+		<item>2 (nieobsługiwany)</item>
+		<item>3 (nieobsługiwany)</item>
+		<item>4 (nieobsługiwany)</item>
+		<item>5 (nieobsługiwany)</item>
+		<item>6 (8PSK, 2700 Hz, 10 s)</item>
+		<item>7 (8PSK, 2500 Hz, 11 s)</item>
+		<item>8 (QPSK, 2500 Hz, 16 s)</item>
+		<item>9 (QPSK, 2250 Hz, 18 s)</item>
+		<item>10 (8PSK, 3200 Hz, 9 s)</item>
+		<item>11 (8PSK, 2400 Hz, 11 s)</item>
+		<item>12 (QPSK, 2400 Hz, 16 s)</item>
+		<item>13 (QPSK, 1600 Hz, 24 s)</item>
+	</string-array>
+	<string name="heap_error">Za mało pamięci</string>
+	<string name="decoding_failed">Dekodowanie nie powiodło się</string>
+	<string name="payload_unknown">Nieznana zawartość</string>
+	<string name="chunk_unsupported">Nieobsługiwany format fragmentu</string>
+	<string name="chunk_duplicate">Odebrano zduplikowany fragment</string>
+	<string name="chunk_redundant">Odebrano nadmiarowy fragment</string>
+	<string name="chunk_corrupted">Uszkodzony fragment obrazu</string>
+	<string name="chunk_received">Odebrano fragment %1$d z %2$d</string>
+	<string name="image_received">Odebrano obraz z %1$d błędami bitowymi</string>
+	<string name="creating_picture_directory_failed">Nie udało się utworzyć katalogu na obrazy.\nSprawdź uprawnienia.</string>
+	<string name="creating_picture_file_failed">Nie udało się utworzyć pliku obrazu.\nSprawdź uprawnienia.</string>
+	<string name="storing_picture_failed">Nie udało się zapisać obrazu</string>
+	<string name="privacy_policy">Polityka prywatności</string>
+	<string name="privacy_policy_text">Aby dekodować obrazy zakodowane w COFDMTV, Assempix potrzebuje dostępu do mikrofonu.
+Dostęp do mikrofonu jest uznawany za wrażliwe uprawnienie, dlatego masz prawo wiedzieć, jak Assempix z niego korzysta:
+Dane nagrane z mikrofonu służą wyłącznie do obsługi dekodera COFDMTV, wskaźnika wysterowania (VU) oraz analizatora widma do wizualizacji zawartości częstotliwościowej.
+Assempix używa bardzo małego bufora tymczasowego w pamięci ulotnej i stale nadpisuje go nowymi danymi z mikrofonu.
+Obrazy wynikowe z dekodera COFDMTV to jedyne dane zapisywane w pamięci trwałej urządzenia.</string>
+	<string name="about">O Assempix</string>
+</resources>
